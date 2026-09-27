@@ -274,6 +274,9 @@ dialog a { color: var(--accent); font-size: 12px; }
 .setup-tabs button { flex: 1; padding: 12px 4px; font-size: 13px; white-space: nowrap; }
 .setup-tabs [aria-selected="true"] { color: var(--accent); border-bottom: 2px solid var(--accent); }
 .setup-panel { padding: 22px 0; }
+#setup-compute { margin: 20px 0; padding-top: 20px; border-top: 1px solid var(--line); }
+#setup-compute-device { width: 100%; min-width: 0; margin: 8px 0 12px; text-overflow: ellipsis; }
+#setup-compute-result { overflow-wrap: anywhere; }
 .setup-panel h3, .setup-component h4 { margin: 0; font-size: 15px; }
 .guide-steps { list-style: none; margin: 0; padding: 0; }
 .guide-steps li { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }

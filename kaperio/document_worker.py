@@ -13,6 +13,7 @@ import time
 from pathlib import Path
 
 import psutil
+from temporary_data import private_workspace, prepare_child, record_child
 
 MEMORY_LIMIT = 2 * 1024**3
 OUTPUT_LIMIT = 1024**3
@@ -193,7 +194,7 @@ class DocumentWorker:
                 raise ValueError('文書を処理中です。プレビューは完了後に表示できます。')
         try:
             check()
-            with tempfile.TemporaryDirectory(prefix='.document-', dir=self.root) as temporary:
+            with private_workspace(self.root, 'document') as temporary:
                 work = Path(temporary)
                 request = json.dumps({'work': str(work), 'operation': operation, 'args': args,
                                       'memory': self.memory, 'timeout': timeout}).encode('utf-8')
@@ -201,6 +202,7 @@ class DocumentWorker:
                     raise ValueError('文書処理の入力が上限を超えています。')
                 flags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
                 env = worker_environment(work)
+                prepare_child(work)
                 process = subprocess.Popen(worker_command(), stdin=subprocess.PIPE,
                                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                                            creationflags=flags, start_new_session=os.name != 'nt',
@@ -214,6 +216,7 @@ class DocumentWorker:
                         pass
                 sender = threading.Thread(target=send_request, daemon=True)
                 try:
+                    record_child(work, process.pid)
                     # Passwords travel over an anonymous pipe, never argv or a request file.
                     sender.start()
                     observed = psutil.Process(process.pid)

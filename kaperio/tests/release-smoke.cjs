@@ -8,8 +8,10 @@ const root = path.resolve(process.argv[2] || path.join(__dirname, '..'));
 const python = path.join(root, '.venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
 const executable = process.env.KAPERIO_EXECUTABLE || python;
 const entry = process.env.KAPERIO_EXECUTABLE ? [] : ['app.py'];
-const data = path.join(root, '.test-data', 'release-browser-' + process.pid);
-fs.mkdirSync(data, {recursive: true});
+const testRoot = path.join(root, '.test-data');
+fs.mkdirSync(testRoot, {recursive: true});
+const data = fs.mkdtempSync(path.join(testRoot, 'release-browser-'));
+const screenshots = path.join(root, '.test-results', 'browser');
 const source = path.join(data, 'Sample.pdf');
 execFileSync(python, ['-c', "import sys; from pathlib import Path; sys.path.insert(0,'tests'); from test_core import make_pdf; make_pdf(Path(sys.argv[1]),'Test42')", source], {cwd: root, windowsHide: true});
 const child = spawn(executable, [...entry, '--port', '0', '--data', data, '--no-browser'], {cwd: root, windowsHide: true, stdio: 'ignore'});
@@ -58,7 +60,8 @@ async function setupChecks(page, context, base, data) {
   await page.locator('#setup-cancel').click();
   await page.locator('#setup-operation-message').filter({hasText:'Synthetic cancelled'}).waitFor();
   assert.equal(await page.locator('#setup-progress').isVisible(),false);
-  fixture.report.backend={status:'recognized',devices:[{name:'Synthetic NVIDIA GPU',backend:'OpenCL',type:'GPU'}],compute_tested:false,nvrtc_missing:true,text:'Synthetic diagnostic log'};
+  fixture.report.backend={status:'recognized',devices:[{id:1,name:'Synthetic NVIDIA GPU',backend:'OpenCL',type:'GPU'}],compute_tested:false,nvrtc_missing:true,text:'Synthetic diagnostic log'};
+  fixture.compute_eligible=true;
   fixture.components[0].eligible=false;fixture.components[0].reason='設定済み';fixture.components[1].eligible=true;fixture.components[1].reason='';
   await page.locator('#setup-tab-diagnostic').click();await page.locator('#setup-diagnose').click();
   await page.locator('#setup-diagnostic-result').filter({hasText:'NVRTC'}).waitFor();
@@ -72,24 +75,51 @@ async function setupChecks(page, context, base, data) {
   assert.match(await page.locator('#setup-component-list').textContent(),/同梱済み・追加通信なし/);
   assert.equal(await page.locator('#install-hashcat').isEnabled(),false);
   assert.equal(await page.locator('#consent-hashcat').isChecked(),false);
+  let computations=0;
+  await page.route('**/api/setup/compute',route=>{
+    assert.deepEqual(route.request().postDataJSON(),{consent:true,device:1});computations++;
+    fixture.compute={state:'running',device:fixture.report.backend.devices[0],message:'Synthetic computing'};fixture.locked=true;
+    return route.fulfill({json:fixture});
+  });
+  await page.route('**/api/setup/compute-cancel',route=>{
+    fixture.compute={state:'cancelled',message:'Synthetic compute cancelled'};fixture.locked=false;return route.fulfill({json:fixture});
+  });
+  await page.locator('#setup-tab-diagnostic').click();
+  assert.equal(computations,0);
+  await page.locator('#setup-compute-start').click();
+  await page.locator('#setup-compute-cancel').waitFor();
+  assert.equal(await page.locator('#setup-diagnose').isEnabled(),false);
+  await page.locator('#setup-compute-cancel').click();
+  await page.locator('#setup-compute-result').filter({hasText:'Synthetic compute cancelled'}).waitFor();
+  fixture.compute={state:'passed',device:fixture.report.backend.devices[0],seconds:2,compute_tested:true};
+  await page.locator('#setup-diagnose').click();
+  await page.locator('#setup-compute-result').filter({hasText:'計算確認済み'}).waitFor();
+  assert.match(await page.locator('#setup-diagnostic-result').textContent(),/速度は未測定/);
   for(const width of [320,390,768,1440]){
     await page.setViewportSize({width,height:900});
     for(const view of ['guide','diagnostic','components']){
       await page.locator('#setup-tab-'+view).click();
       assert.ok(await page.locator('#setup-dialog').evaluate(n=>n.scrollWidth<=n.clientWidth),'setup overflow '+width+' '+view);
       await page.screenshot({path:path.join(data,'setup-'+view+'-'+width+'.png'),fullPage:true});
+      if(view==='diagnostic'){
+        await page.locator('#setup-compute-start').scrollIntoViewIfNeeded();
+        const bounds=await page.locator('#setup-compute-start').boundingBox();
+        assert.ok(bounds.x>=0&&bounds.x+bounds.width<=width,'compute button overflow');
+        await page.screenshot({path:path.join(data,'setup-compute-'+width+'.png'),fullPage:true});
+      }
     }
   }
   await page.locator('#setup-finish').click();
   await page.locator('#setup-dialog').waitFor({state:'hidden'});
   await page.unroute('**/api/setup');await page.unroute('**/api/setup/diagnose');await page.unroute('**/api/setup/install');await page.unroute('**/api/setup/cancel');
+  await page.unroute('**/api/setup/compute');await page.unroute('**/api/setup/compute-cancel');
   assert.equal((await (await context.request.get(base+'/api/setup')).json()).guide_seen,true);
   await page.reload();await page.locator('#empty').waitFor();
   assert.equal(await page.locator('#setup-dialog').isVisible(),false);
   await page.locator('#guide-open').click();await page.locator('#setup-dialog').waitFor();
   await page.locator('#setup-close').click();await page.locator('#setup-dialog').waitFor({state:'hidden'});
   await page.setViewportSize({width:1440,height:1000});
-  console.log(JSON.stringify({setupPassed:true,checks:['first-run-guide','optional-component-consent','gpu-inventory-vs-backend','setup-download-error','setup-progress-cancel','native-bundle-consent','responsive-setup','guide-reopen','no-automatic-network']}));
+  console.log(JSON.stringify({setupPassed:true,checks:['first-run-guide','optional-component-consent','gpu-inventory-vs-backend','setup-download-error','setup-progress-cancel','native-bundle-consent','responsive-setup','guide-reopen','no-automatic-network','gpu-compute-opt-in','gpu-compute-cancel','gpu-compute-result','responsive-compute']}));
 }
 
 async function settingsChecks(page, context, base, data) {
@@ -451,5 +481,22 @@ async function passwordResultChecks(page, context, base, data) {
     await Promise.race([exited, delay(3000)]);
     if (child.exitCode === null) child.kill();
     await exited;
+    fs.mkdirSync(screenshots, {recursive:true});
+    for(const name of fs.readdirSync(data)){
+      if(name.endsWith('.png')&&fs.lstatSync(path.join(data,name)).isFile())fs.copyFileSync(path.join(data,name),path.join(screenshots,name));
+    }
+    if(process.env.KAPERIO_KEEP_TEST_DATA!=='1'){
+      const resolved=fs.realpathSync(data),parent=fs.realpathSync(testRoot);
+      assert.equal(path.dirname(resolved),parent);
+      assert.ok(path.basename(resolved).startsWith('release-browser-'));
+      const pending=[resolved];
+      while(pending.length){for(const item of fs.readdirSync(pending.pop(),{withFileTypes:true})){
+        const name=path.join(item.parentPath||item.path,item.name);
+        assert.ok(!fs.lstatSync(name).isSymbolicLink(),'Refuse linked test data');
+        if(item.isDirectory())pending.push(name);
+      }}
+      fs.rmSync(resolved,{recursive:true});
+      console.log(JSON.stringify({testDataRemoved:true,screenshots}));
+    }
   }
 })().catch(error => {console.error(error); process.exitCode = 1;});

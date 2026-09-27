@@ -1,4 +1,4 @@
-# Loxmit Desktop 0.4.0-alpha.11
+# Loxmit Desktop 0.4.0-alpha.12
 
 Storage protection checks and signing preparation are described in
 [SECURITY_READINESS.md](SECURITY_READINESS.md) and [SIGNING.md](SIGNING.md).

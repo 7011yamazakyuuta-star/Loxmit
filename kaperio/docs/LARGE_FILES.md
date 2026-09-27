@@ -33,6 +33,16 @@ Run from the `kaperio` directory on the target OS:
 .venv/Scripts/python.exe tests/large_documents.py --fixtures .test-data/large-documents --executable dist/Loxmit/Loxmit.exe --report .test-data/large-results/after.json
 ```
 
+For routine validation, omit `--fixtures` and `--prepare`:
+
+```powershell
+.venv/Scripts/python.exe tests/large_documents.py --executable dist/Loxmit/Loxmit.exe --report .test-results/large.json
+```
+
+This generates fixtures in a unique temporary directory and deletes them even
+when a test fails. Only the small report remains. Explicit `--prepare --fixtures`
+is reserved for intentionally retained cross-version comparisons.
+
 Use the corresponding virtualenv Python and native executable paths on other OSes.
 Run the same fixtures against the old executable for a baseline. Results identify
 the executable and fixture SHA-256 values. Fixture encryption uses fresh randomness;

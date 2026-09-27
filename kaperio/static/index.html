@@ -155,7 +155,7 @@
     <div class="diagnostic-row"><button type="button" id="diagnostics" disabled><i data-lucide="cpu"></i><span id="diagnostics-label">GPUを確認</span></button><span id="gpu-status" class="muted">未確認</span></div>
     <details id="diagnostics-details" hidden><summary><i data-lucide="chevron-right"></i>診断ログ</summary><pre id="diagnostics-result"></pre></details>
   </section>
-  <section class="settings-section settings-storage"><div class="settings-heading"><h3>ライブラリの保存先</h3><button type="button" id="security-open"><i data-lucide="shield-check"></i>保護状態</button></div><div id="output-path" class="path"></div></section>
+  <section class="settings-section settings-storage"><div class="settings-heading"><h3>ライブラリの保存先</h3><button type="button" id="security-open"><i data-lucide="shield-check"></i>保護状態</button></div><div id="output-path" class="path"></div><p id="startup-summary" class="muted" hidden></p></section>
   <div class="settings-footer"><a href="/api/licenses" target="_blank" rel="noopener">ライセンス</a><span id="settings-save-state" class="muted" aria-live="polite"></span><button type="submit" class="primary" id="settings-save"><i data-lucide="save"></i>保存して閉じる</button></div>
 </form></dialog>
 <dialog id="security-dialog" aria-labelledby="security-title">
@@ -190,9 +190,19 @@
   </section>
   <section id="setup-diagnostic" class="setup-panel" role="tabpanel" aria-labelledby="setup-tab-diagnostic" hidden>
     <div class="settings-heading"><h3>このPCの実行環境</h3><button type="button" id="setup-diagnose"><i data-lucide="scan-line"></i>診断する</button></div>
-    <p class="setup-note">ドライバーの変更、ファイルの解析、負荷テストは行いません。</p>
+    <p class="setup-note">認識診断では計算しません。ドライバーは変更しません。</p>
     <div id="setup-diagnostic-result" aria-live="polite"><p class="muted">未診断</p></div>
     <details id="setup-diagnostic-details" hidden><summary><i data-lucide="chevron-right"></i>Hashcatの診断ログ</summary><pre id="setup-diagnostic-log"></pre></details>
+    <section id="setup-compute" hidden>
+      <h3>GPU計算テスト</h3>
+      <p class="setup-note">テスト用PDFのみ使用・低負荷設定・最大120秒。温度取得可能時は75℃で中止。</p>
+      <label for="setup-compute-device">テストするGPU</label>
+      <select id="setup-compute-device"></select>
+      <div class="inline-actions"><button type="button" id="setup-compute-start"><i data-lucide="play"></i>計算テストを実行</button><button type="button" id="setup-compute-cancel" hidden><i data-lucide="square"></i>テストを中止</button></div>
+      <p id="setup-compute-result" role="status"></p>
+      <details id="setup-compute-details" hidden><summary>計算テストの診断ログ</summary><pre id="setup-compute-log"></pre></details>
+      <p class="setup-note">判定対象：PDF 1.1–1.3の照合。速度・全形式の動作保証ではありません。テスト用データは終了後に削除します。</p>
+    </section>
     <button type="button" id="diagnostic-next"><i data-lucide="package-plus"></i>必要な追加部品を確認</button>
   </section>
   <section id="setup-components" class="setup-panel" role="tabpanel" aria-labelledby="setup-tab-components" hidden>

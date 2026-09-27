@@ -11,6 +11,7 @@ import tempfile
 import threading
 import time
 import zipfile
+from contextlib import ExitStack
 from pathlib import Path
 from urllib.parse import parse_qs, quote, urlsplit
 
@@ -277,15 +278,29 @@ def run_case(executable, fixtures, record, work):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--fixtures', type=Path, required=True)
+    parser.add_argument('--fixtures', type=Path, help='Reuse explicitly retained synthetic fixtures; omitted = temporary fixtures')
     parser.add_argument('--prepare', action='store_true')
     parser.add_argument('--executable', type=Path)
     parser.add_argument('--report', type=Path)
     args = parser.parse_args()
     if args.prepare:
+        if not args.fixtures:
+            parser.error('--prepare requires an explicit --fixtures directory to retain')
         print(json.dumps(prepare(args.fixtures), indent=2), flush=True)
         return
-    records = json.loads((args.fixtures / 'fixtures.json').read_text())
+    if not args.report or not args.executable:
+        parser.error('--report and --executable are required for validation')
+    args.report.parent.mkdir(parents=True, exist_ok=True)
+    with ExitStack() as stack:
+        if not args.fixtures:
+            args.fixtures = Path(stack.enter_context(tempfile.TemporaryDirectory(prefix='large-fixtures-', dir=args.report.parent)))
+            records = prepare(args.fixtures)
+        else:
+            records = json.loads((args.fixtures / 'fixtures.json').read_text())
+        run_suite(args, records)
+
+
+def run_suite(args, records):
     report = {'system': platform.platform(), 'physical_memory_bytes': psutil.virtual_memory().total,
               'sample_interval_ms': 20, 'executable_sha256': digest(args.executable), 'cases': [],
               'limitations': ['Synthetic image-heavy documents; not all real documents.', 'Known-password decryption, not GPU recovery.',

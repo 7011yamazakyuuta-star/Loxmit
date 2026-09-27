@@ -46,10 +46,16 @@ driver. OS detection, backend device enumeration and untested computation are
 separate states. An absent inventory result is not proof that no GPU is fitted.
 CPU-only and failed backend results are not reported as GPU-ready.
 
+alpha.12 adds a separate opt-in GPU computation check after enumeration. It uses
+only a generated synthetic PDF, selects one enumerated GPU, verifies the exact
+answer, and removes its scratch data. It is not a throughput benchmark or proof
+of support for every format. See [limits and cleanup](RECOVERY_DIAGNOSTICS.md).
+
 NVRTC is offered only after the current configured engine reports missing NVRTC
 and OS inventory identifies NVIDIA hardware. It remains optional: a working
 OpenCL backend may not need it. Installation is not evidence of successful CUDA
-computation; users rerun diagnostics, and compute/throughput remain unverified.
+computation; users rerun diagnostics and explicitly run the computation check.
+Throughput remains unmeasured by this check.
 Driver/GPU compatibility can still prevent use; the app will not fix that by
 silently replacing a driver. Only Hashcat child processes receive the private
 NVRTC directory in their environment. No process-wide PATH is changed.
