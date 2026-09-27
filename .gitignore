@@ -6,6 +6,7 @@
 **/.venv/
 **/.audit-venv/
 **/.test-data/
+**/.test-results/
 **/.tmp/
 **/__pycache__/
 *.log

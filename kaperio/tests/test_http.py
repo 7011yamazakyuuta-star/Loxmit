@@ -56,6 +56,21 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(self.request('POST','/api/import',b'not a pdf',headers)[0],400)
         self.assertEqual(self.library.snapshot(),[])
 
+    def test_compute_routes_require_auth_origin_and_do_not_start_on_read(self):
+        headers = {'Cookie': 'loxmit_session=test-capability', 'X-Loxmit': '1'}
+        with patch.object(self.library.setup, 'start_compute') as start, patch.object(self.library.setup, 'cancel_compute') as cancel:
+            self.assertEqual(self.request('GET', '/api/setup', headers=headers)[0], 200)
+            start.assert_not_called()
+            for route in ('/api/setup/compute', '/api/setup/compute-cancel'):
+                self.assertEqual(self.request('POST', route, '{}')[0], 403)
+                self.assertEqual(self.request('POST', route, '{}', dict(headers, Origin='https://other.example'))[0], 403)
+            start.assert_not_called()
+            cancel.assert_not_called()
+            self.assertEqual(self.request('POST', '/api/setup/compute', '{"consent":true,"device":1}', headers)[0], 200)
+            start.assert_called_once_with({'consent': True, 'device': 1})
+            self.assertEqual(self.request('POST', '/api/setup/compute-cancel', '{}', headers)[0], 200)
+            cancel.assert_called_once()
+
     def test_security_checks_require_auth_origin_and_do_not_run_on_read(self):
         headers = {'Cookie': 'loxmit_session=test-capability', 'X-Loxmit': '1'}
         with patch.object(self.library.security, 'check', return_value={'storage': {'state': 'unknown'}}) as check:

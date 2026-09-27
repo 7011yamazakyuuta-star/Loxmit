@@ -10,7 +10,7 @@ ZIPまたはtar.gzを展開し、Loxmitを起動します。同梱フォルダ�
 Pythonは不要です。画面は既定ブラウザーで開きます。
 初回ガイドで同意すると、Windows x64では公式Hashcatを自動ダウンロード、
 macOS 15以降（Apple Silicon／Intel）とLinux x86-64では同梱Hashcatを自動展開します。
-ドライバー、Homebrew、CUDA Toolkit一式は導入しません。GPU診断は認識状態の照会であり、速度テストではありません。
+ドライバー、Homebrew、CUDA Toolkit一式は導入しません。GPUの認識診断に加え、任意の計算テストでテスト用PDFの照合を確認できます。速度テストではありません。
 任意のNVRTC自動追加はWindows x64のみです。ZIP探索用zip2johnは手動設定です。
 [初回準備の詳細](docs/SETUP.md)を参照してください。
 署名・公証、実機検証、保存先の詳細は[デスクトップ配布](docs/DESKTOP.md)を参照してください。

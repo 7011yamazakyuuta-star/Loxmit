@@ -17,6 +17,7 @@ import zipfile
 from pathlib import Path, PurePosixPath
 
 from runtime import APP_DIR, engine_environment
+from gpu_check import engine_identity, run_compute
 
 CREATE_FLAGS = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
 CATALOG_REVISION = '2026-09-25.2'
@@ -308,6 +309,10 @@ class SetupManager:
         self.diagnosing = False
         self.report = None
         self.diagnosed_engine = None
+        self.diagnosed_identity = None
+        self.compute = {'state': 'idle', 'compute_tested': False}
+        self.compute_stop = threading.Event()
+        self.compute_thread = None
         self.status = {'phase': 'idle', 'message': '', 'received': 0, 'total': 0}
 
     def item(self, key):
@@ -315,7 +320,7 @@ class SetupManager:
 
     @property
     def busy(self):
-        return self.status['phase'] in ACTIVE or self.diagnosing
+        return self.status['phase'] in ACTIVE or self.diagnosing or self.compute['state'] in {'running', 'cancelling'}
 
     def receipt_path(self, key):
         return self.root / CATALOG[key]['folder'] / 'loxmit-receipt.json'
@@ -371,6 +376,9 @@ class SetupManager:
                     'platform': platform.system(), 'automatic_supported': supported,
                     'destination': str(self.root), 'components': components,
                     'operation': dict(self.status), 'diagnosing': self.diagnosing,
+                    'compute': dict(self.compute) if self.diagnosed_identity == engine_identity(self.library.hashcat) else {'state': 'idle', 'compute_tested': False},
+                    'compute_eligible': bool(self.report and self.report['backend'].get('status') == 'recognized'
+                                             and self.diagnosed_identity and self.diagnosed_identity == engine_identity(self.library.hashcat)),
                     'report': self.report, 'locked': self.library.settings_snapshot()['settings_locked']}
 
     def dismiss(self):
@@ -386,6 +394,8 @@ class SetupManager:
                 raise ValueError('探索・導入が終わってから診断してください。')
             self.diagnosing = True
             engine = self.library.hashcat
+            self.compute = {'state': 'idle', 'compute_tested': False}
+            identity = engine_identity(engine)
         try:
             hardware = hardware_inventory()
             backend = {'status': 'missing', 'devices': [], 'compute_tested': False, 'nvrtc_missing': False, 'text': ''}
@@ -398,9 +408,43 @@ class SetupManager:
             with self.library.lock:
                 self.report = {'hardware': hardware, 'backend': backend, 'checked_at': time.time()}
                 self.diagnosed_engine = str(engine)
+                self.diagnosed_identity = identity
         finally:
             self.diagnosing = False
         return self.snapshot()
+
+    def start_compute(self, data):
+        with self.library.lock:
+            if self.busy or self.library.settings_snapshot()['settings_locked']:
+                raise ValueError('探索・診断・導入の終了を待ってください。')
+            if (set(data) != {'consent', 'device'} or data['consent'] is not True
+                    or type(data['device']) is not int):
+                raise ValueError('GPUを選び、計算テストの実行を許可してください。')
+            if not self.snapshot()['compute_eligible']:
+                raise ValueError('先にGPUの認識状態を再診断してください。')
+            device = next((d for d in self.report['backend']['devices']
+                           if d['id'] == data['device'] and 'GPU' in d['type']), None)
+            if not device:
+                raise ValueError('診断で確認できたGPUを選択してください。')
+            self.compute_stop.clear()
+            self.compute = {'state': 'running', 'compute_tested': False, 'device': dict(device),
+                            'message': '計算テスト中（準備を含め最大120秒）'}
+            self.compute_thread = threading.Thread(target=self._compute, args=(self.library.hashcat, dict(device)), daemon=True)
+            self.compute_thread.start()
+
+    def _compute(self, engine, device):
+        try:
+            result = run_compute(engine, self.library.root, device, self.compute_stop)
+        except Exception:
+            result = {'state': 'error', 'compute_tested': False, 'message': '計算テストを完了できませんでした。'}
+        with self.library.lock:
+            self.compute = result
+
+    def cancel_compute(self):
+        with self.library.lock:
+            if self.compute['state'] in {'running', 'cancelling'}:
+                self.compute_stop.set()
+                self.compute.update(state='cancelling', message='計算テストを中止しています。')
 
     def start(self, data):
         with self.library.lock:
@@ -467,6 +511,8 @@ class SetupManager:
                 if key == 'hashcat':
                     self.library.save_settings({'hashcat': str(target / item.get('executable', 'hashcat.exe'))}, _setup=True)
                 self.report = None
+                self.compute = {'state': 'idle', 'compute_tested': False}
+                self.diagnosed_identity = None
                 self.status.update(phase='complete', message='導入済みです。GPU診断で認識状態を確認してください。')
         except Cancelled:
             with self.library.lock:
@@ -477,6 +523,9 @@ class SetupManager:
                 self.status.update(phase='error', message=message)
 
     def close(self):
+        self.cancel_compute()
+        if self.compute_thread:
+            self.compute_thread.join(timeout=15)
         self.cancel()
         if self.thread:
             self.thread.join(timeout=100)

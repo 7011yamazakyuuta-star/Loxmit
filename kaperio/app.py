@@ -31,6 +31,7 @@ from formats import SUPPORTED, office_renderer, render_office, discover_zip2john
 from runtime import APP_DIR, APP_NAME, VERSION, data_directory, engine_environment
 from environment_setup import SetupManager
 from security_status import SecurityStatus
+from temporary_data import atomic_json, cleanup_stale, private_workspace
 
 DEFAULT_DATA = data_directory()
 BUSY = {'queued', 'preparing', 'recovering', 'pausing', 'converting', 'unlocking'}
@@ -125,6 +126,7 @@ class Library:
         self.jobs = {}
         self.stops = {}
         self.passwords = {}
+        self.startup = {'interrupted': 0, 'removed': 0, 'bytes': 0, 'skipped': 0}
         self.recovery_pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix='hashcat')
         self.export_pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix='export')
         self.hashcat = self.discover_hashcat()
@@ -136,10 +138,15 @@ class Library:
         self.zip2john = None if settings.get('zip2john') == '' else discover_zip2john(settings.get('zip2john'))
         for path in self.root.glob('*/job.json'):
             try:
+                if (path.is_symlink() or path.parent.is_symlink()
+                        or path.parent.resolve().parent != self.root
+                        or getattr(path.parent.lstat(), 'st_file_attributes', 0) & 0x400):
+                    continue
                 job = json.loads(path.read_text(encoding='utf-8'))
                 if job['id'] != path.parent.name:
                     continue
-                if job['state'] in BUSY:
+                interrupted = job['state'] in BUSY
+                if interrupted:
                     started = job.pop('activity_started', None)
                     if started:
                         job['elapsed'] = job.get('elapsed', 0) + max(0, job.get('updated', started) - started)
@@ -147,6 +154,9 @@ class Library:
                     job['message'] = '前回の処理が中断されました。'
                 self.jobs[job['id']] = job
                 self.stops[job['id']] = threading.Event()
+                if interrupted:
+                    self.save(job)
+                    self.startup['interrupted'] += 1
             except (OSError, ValueError, KeyError):
                 continue
         self.setup = SetupManager(self)
@@ -177,6 +187,7 @@ class Library:
         with self.lock:
             return {'hashcat': str(self.hashcat or ''), 'zip2john': str(self.zip2john or ''),
                     'output_dir': str(self.root), 'version': VERSION,
+                    'startup': dict(self.startup),
                     'hashcat_configured': bool(self.hashcat and self.hashcat.is_file()),
                     'zip2john_configured': bool(self.zip2john and self.zip2john.is_file()),
                     'settings_locked': self.setup.busy or any(j['state'] in {'preparing', 'recovering', 'queued', 'pausing'} for j in self.jobs.values())}
@@ -189,9 +200,7 @@ class Library:
                 raise ValueError('探索を停止してから設定を変更してください。')
             candidate = tool_path(data.get('hashcat', self.hashcat), 'hashcat')
             zip2john = tool_path(data.get('zip2john', self.zip2john), 'zip2john')
-            temporary = self.root / 'settings.tmp'
-            temporary.write_text(json.dumps({'hashcat': str(candidate or ''), 'zip2john': str(zip2john or '')}), encoding='utf-8')
-            temporary.replace(self.root / 'settings.json')
+            atomic_json(self.root / 'settings.json', {'hashcat': str(candidate or ''), 'zip2john': str(zip2john or '')})
             self.hashcat, self.zip2john = candidate, zip2john
             refresh = [job for job in self.jobs.values()
                        if job['info']['format'] == 'zip' and not job.get('unlocked') and job['state'] not in BUSY]
@@ -214,9 +223,7 @@ class Library:
     def save(self, job):
         with self.lock:
             path = self.folder(job['id']) / 'job.json'
-            temp = path.with_suffix('.tmp')
-            temp.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding='utf-8')
-            temp.replace(path)
+            atomic_json(path, job)
 
     def update(self, job_id, **fields):
         with self.lock:
@@ -275,7 +282,7 @@ class Library:
         try:
             if shutil.disk_usage(self.root).free < length + DISK_RESERVE:
                 raise OSError(errno.ENOSPC, '保存先の空き容量が不足しています。')
-            with tempfile.TemporaryDirectory(prefix='.upload-', dir=self.root) as temporary:
+            with private_workspace(self.root, 'upload') as temporary:
                 source = Path(temporary) / ('source' + extension)
                 digest = hashlib.sha256()
                 remaining = length
@@ -701,6 +708,10 @@ class Handler(BaseHTTPRequestHandler):
                 self.library.setup.diagnose()
             elif action == 'install':
                 self.library.setup.start(data)
+            elif action == 'compute':
+                self.library.setup.start_compute(data)
+            elif action == 'compute-cancel':
+                self.library.setup.cancel_compute()
             elif action == 'cancel':
                 self.library.setup.cancel()
             elif action == 'dismiss':
@@ -794,7 +805,9 @@ def main():
                 pass
         print(APP_NAME + ' is already running for this data directory.', flush=True)
         return
+    cleanup = cleanup_stale(args.data)
     library = Library(args.data)
+    library.startup.update(cleanup)
     server = None
     for port in range(args.port, args.port + 20):
         try:

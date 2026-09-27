@@ -373,7 +373,7 @@ function updateSettingsState(){
   for(const node of $('settings-form').querySelectorAll('input,button'))node.disabled=settingsBusy||(locked&&node.id!=='settings-close');
   $('diagnostics').disabled=settingsBusy||locked||!draft.hashcat;
 }
-function applySettings(s){savedSettings=s;$('hashcat-path').value=s.hashcat||'';$('zip2john-path').value=s.zip2john||'';$('output-path').textContent=s.output_dir;updateSettingsState()}
+function applySettings(s){savedSettings=s;$('hashcat-path').value=s.hashcat||'';$('zip2john-path').value=s.zip2john||'';$('output-path').textContent=s.output_dir;const r=s.startup||{};$('startup-summary').hidden=!(r.interrupted||r.removed||r.skipped);$('startup-summary').textContent=`起動時：中断処理 ${r.interrupted||0}件・一時データ整理 ${r.removed||0}件（${((r.bytes||0)/1048576).toFixed(1)} MB）・安全確認待ち ${r.skipped||0}件`;updateSettingsState()}
 async function saveSettings(){
   clearSettingsErrors();const result=await api('/api/settings',settingsDraft());applySettings(result);return result;
 }

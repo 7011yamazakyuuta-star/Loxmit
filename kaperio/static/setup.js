@@ -12,9 +12,30 @@
   function failure(error){$('setup-error').textContent=error.message;$('setup-error').hidden=false}
   function clearError(){$('setup-error').hidden=true;$('setup-error').textContent=''}
   function active(){return ['downloading','verifying','extracting','configuring','cancelling'].includes(snapshot?.operation.phase)}
+  function computing(){return ['running','cancelling'].includes(snapshot?.compute?.state)}
+  function renderCompute(){
+    const value=snapshot.compute||{state:'idle'},select=$('setup-compute-device');
+    const devices=(snapshot.report?.backend.devices||[]).filter(d=>d.type.includes('GPU'));
+    $('setup-compute').hidden=!snapshot.compute_eligible&&!computing();
+    const key=JSON.stringify(devices);
+    if(select.dataset.devices!==key){
+      const selected=select.value;select.replaceChildren();
+      for(const device of devices){const option=el('option','',`${device.name} / ${device.backend} #${device.id}`);option.value=device.id;select.append(option)}
+      if(devices.some(d=>String(d.id)===selected))select.value=selected;
+      select.dataset.devices=key;
+    }
+    select.disabled=pending||snapshot.locked||computing();
+    $('setup-compute-start').disabled=pending||snapshot.locked||!snapshot.compute_eligible||!devices.length;
+    $('setup-compute-start').hidden=computing();
+    $('setup-compute-cancel').hidden=!computing();
+    $('setup-compute-cancel').disabled=pending||value.state==='cancelling';
+    $('setup-compute-result').textContent=value.state==='passed'?`計算確認済み：${value.device.name} / ${value.device.backend}（${value.seconds}秒・準備込み）`:value.message||'未実施';
+    $('setup-compute-result').classList.toggle('field-error',['error','timeout'].includes(value.state));
+    $('setup-compute-details').hidden=!value.details;$('setup-compute-log').textContent=value.details||'';
+  }
   function row(label,value){const n=el('div','diagnosis-row');n.append(el('span','muted',label),el('strong','',value));return n}
   function renderReport(report){
-    const key=JSON.stringify(report);if(key===reportKey)return;reportKey=key;
+    const key=JSON.stringify([report,snapshot?.compute]);if(key===reportKey)return;reportKey=key;
     const root=$('setup-diagnostic-result');root.replaceChildren();
     if(!report){root.append(el('p','muted','未診断'));$('setup-diagnostic-details').hidden=true;return}
     const hardware=report.hardware,backend=report.backend;
@@ -25,7 +46,7 @@
     root.append(row('探索エンジン',names[backend.status]||'未確認'));
     const devices=el('ul','diagnosis-devices');
     for(const device of backend.devices)devices.append(el('li','',`${device.name} / ${device.backend} ${device.type}`));root.append(devices);
-    root.append(row('計算動作・速度','未検証（デバイス照会のみ）'));
+    root.append(row('計算動作・速度',snapshot?.compute?.state==='passed'?'計算確認済み（速度は未測定）':'未検証（デバイス照会のみ）'));
     if(backend.nvrtc_missing)root.append(el('p','setup-note','CUDA初期化に必要なNVRTCを確認できません。「追加部品」で導入可否を確認できます。'));
     $('setup-diagnostic-details').hidden=!backend.text;$('setup-diagnostic-log').textContent=backend.text||'';
   }
@@ -63,9 +84,9 @@
     $('setup-operation-message').textContent=progress.message||'';
     $('setup-operation-message').classList.toggle('field-error',progress.phase==='error');
     $('setup-check-again').hidden=progress.phase!=='complete';
-    renderReport(snapshot.report);renderComponents();icons();
+    renderReport(snapshot.report);renderCompute();renderComponents();icons();
   }
-  function schedule(){clearTimeout(timer);if(active())timer=setTimeout(refreshSetup,700)}
+  function schedule(){clearTimeout(timer);if(active()||computing())timer=setTimeout(refreshSetup,700)}
   async function refreshSetup(){try{snapshot=await api('/api/setup');render();schedule()}catch(error){failure(error)}}
   async function open(view='guide'){
     try{
@@ -96,5 +117,11 @@
   $('setup-close').onclick=close;$('setup-finish').onclick=close;
   $('setup-dialog').addEventListener('cancel',event=>{event.preventDefault();close()});
   $('setup-cancel').onclick=async()=>{try{snapshot=await api('/api/setup/cancel',{});render();schedule()}catch(error){failure(error)}};
+  async function compute(cancel=false){
+    pending=true;clearError();render();
+    try{snapshot=await api(cancel?'/api/setup/compute-cancel':'/api/setup/compute',cancel?{}:{consent:true,device:Number($('setup-compute-device').value)})}catch(error){failure(error)}
+    finally{pending=false;render();schedule()}
+  }
+  $('setup-compute-start').onclick=()=>compute();$('setup-compute-cancel').onclick=()=>compute(true);
   api('/api/setup').then(result=>{if(!result.guide_seen)open()}).catch(()=>{});
 })();
