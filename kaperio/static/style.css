@@ -34,6 +34,10 @@ svg { width: 18px; height: 18px; flex: 0 0 auto; }
 .brand img { width: 44px; height: 44px; object-fit: contain; }
 .brand span { font-size: 25px; font-weight: 700; }
 .top-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.language-control { display: flex; align-items: center; gap: 6px; margin: 0; min-width: 0; }
+.language-control select { width: 172px; min-width: 0; max-width: 100%; margin: 0; padding: 7px; font-size: 12px; }
+button > span, a > span { min-width: 0; overflow-wrap: anywhere; }
+html[lang="en"] { font-family: system-ui, "Segoe UI", sans-serif; }
 .local-status { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; }
 .local-status svg { width: 15px; height: 15px; }
 .local-status.offline { color: #9a6700; }
@@ -105,6 +109,7 @@ input[type="checkbox"] { width: 15px; height: 15px; min-height: 15px; margin: 0;
 .form-submit { margin-top: 24px; }
 #strategy { max-width: 360px; }
 .field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 19px; }
+.field-row > label { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
 .field-row input, .field-row select, .field-row textarea { margin-top: 8px; }
 fieldset { border: 0; padding: 0; margin: 19px 0; }
 .charset { display: flex; flex-wrap: wrap; gap: 12px 20px; }
@@ -271,7 +276,7 @@ dialog a { color: var(--accent); font-size: 12px; }
 #setup-dialog { width: min(700px, calc(100% - 24px)); padding: 24px; }
 .setup-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .setup-tabs { display: flex; gap: 12px; margin-bottom: 0; }
-.setup-tabs button { flex: 1; padding: 12px 4px; font-size: 13px; white-space: nowrap; }
+.setup-tabs button { flex: 1 1 0; min-width: 0; padding: 12px 4px; font-size: 13px; white-space: normal; }
 .setup-tabs [aria-selected="true"] { color: var(--accent); border-bottom: 2px solid var(--accent); }
 .setup-panel { padding: 22px 0; }
 #setup-compute { margin: 20px 0; padding-top: 20px; border-top: 1px solid var(--line); }
@@ -319,13 +324,16 @@ pre { background: #f4f5f7; padding: 13px; font-size: 11px; line-height: 1.6; max
   .preview-body { max-height: 500px; }
 }
 @media (max-width: 650px) {
-  .topbar { height: 60px; padding: 0 12px; gap: 10px; }
+  .topbar { height: auto; min-height: 60px; padding: 8px 12px; gap: 6px 10px; flex-wrap: wrap; }
   .brand { gap: 5px; }
   .brand span { font-size: 22px; }
   .brand img { width: 38px; height: 38px; }
   .local-status { margin-left: auto; }
   .local-status > span { display: none; }
-  .top-actions { gap: 2px; margin-left: 0; }
+  .top-actions { gap: 2px; margin-left: 0; width: 100%; }
+  .language-control { margin-right: auto; }
+  .language-control select { width: 150px; }
+  .language-control > svg { display: none; }
   .top-actions .quiet { padding: 8px; }
   .top-actions button span { display: none; }
   .workspace { display: block; }
@@ -365,6 +373,7 @@ pre { background: #f4f5f7; padding: 13px; font-size: 11px; line-height: 1.6; max
   .preview-body { padding: 12px; }
   #settings-form { padding: 18px; }
   .settings-section { padding: 18px 0; }
+  .settings-heading { flex-wrap: wrap; }
   .capability-list { font-size: 12px; gap: 12px 10px; }
   .engine-state a { margin-left: 0; }
   .settings-footer { gap: 9px; }

@@ -1,0 +1,43 @@
+name: Bug report / 不具合報告
+description: Report a reproducible problem using synthetic data.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "English or Japanese is welcome. Do not share private files, passwords, hashes, launch URLs, or unreviewed logs. 脆弱性はSecurityタブの非公開窓口へ。"
+  - type: input
+    id: version
+    attributes:
+      label: Loxmit version / バージョン
+      placeholder: 0.4.0-alpha.13
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS, architecture, browser / 環境
+      placeholder: Windows 11 x64, Edge
+    validations:
+      required: true
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU and Hashcat version, if relevant / 必要な場合
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps with synthetic data / 人工データでの再現手順
+      description: Include expected and actual behavior. Do not attach real documents.
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Redacted error or screenshot / 個人情報を除いたエラー
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check / 確認
+      options:
+        - label: I removed private files, passwords, hashes, tokens, and launch URLs.
+          required: true

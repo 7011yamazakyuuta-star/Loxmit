@@ -56,6 +56,26 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(self.request('POST','/api/import',b'not a pdf',headers)[0],400)
         self.assertEqual(self.library.snapshot(),[])
 
+    def test_language_routes_are_authenticated_and_available_while_busy(self):
+        headers = {'Cookie': 'loxmit_session=test-capability', 'X-Loxmit': '1'}
+        self.assertEqual(self.request('GET', '/api/language')[0], 403)
+        self.assertEqual(self.request('POST', '/api/language', '{"language":"en"}')[0], 403)
+        self.assertEqual(self.request('POST', '/api/language', '{"language":"en"}', dict(headers, Origin='https://other.example'))[0], 403)
+        self.assertEqual(self.library.language, 'auto')
+        for route in ('/i18n.js', '/messages-en.js'):
+            self.assertEqual(self.request('GET', route, headers=headers)[0], 200)
+        self.library.jobs['fixture'] = {'state': 'recovering'}
+        try:
+            status, raw = self.request('POST', '/api/language', '{"language":"en"}', headers)
+            self.assertEqual(status, 200)
+            self.assertEqual(json.loads(raw), {'language': 'en'})
+            self.assertEqual(self.library.jobs['fixture']['state'], 'recovering')
+        finally:
+            self.library.jobs.clear()
+        for body in ('{"language":"fr"}', '{"language":null}', '{"language":["en"]}', '{"language":"en","hashcat":"other"}'):
+            self.assertEqual(self.request('POST', '/api/language', body, headers)[0], 400)
+        self.assertEqual(self.library.language, 'en')
+
     def test_compute_routes_require_auth_origin_and_do_not_start_on_read(self):
         headers = {'Cookie': 'loxmit_session=test-capability', 'X-Loxmit': '1'}
         with patch.object(self.library.setup, 'start_compute') as start, patch.object(self.library.setup, 'cancel_compute') as cancel:

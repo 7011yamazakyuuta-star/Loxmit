@@ -1,0 +1,20 @@
+name: Feature or translation / 改善・翻訳
+description: Suggest a focused improvement in English or Japanese.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case / 困っていること
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement / 改善案
+      description: For translation changes, include the screen and preferred wording.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and limits / 代替案・制約

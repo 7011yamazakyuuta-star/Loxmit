@@ -1,7 +1,14 @@
 {
-  "version": "0.4.0-alpha.12",
+  "version": "0.4.0-alpha.13",
   "files": [
     ".gitignore", "LICENSE", "README.md", "Setup.cmd", "Kaperio.cmd", "Loxmit.cmd",
+    "README.ja.md", "CONTRIBUTING.md", "SECURITY.md",
+    ".github/ISSUE_TEMPLATE/bug_report.yml", ".github/ISSUE_TEMPLATE/feature_request.yml",
+    ".github/ISSUE_TEMPLATE/config.yml", ".github/pull_request_template.md",
+    "kaperio/README.ja.md", "kaperio/docs/OUTREACH.md",
+    "kaperio/static/i18n.js", "kaperio/static/messages-en.js",
+    "kaperio/tests/test_i18n.py", "kaperio/tests/i18n-smoke.cjs",
+    "kaperio/docs/interface-en.png", "kaperio/docs/LOCALIZATION.md",
     ".github/workflows/desktop.yml",
     "kaperio/LICENSE", "kaperio/README.md", "kaperio/SECURITY.md", "kaperio/THIRD_PARTY.md",
     "kaperio/app.py", "kaperio/formats.py", "kaperio/pdf_tools.py", "kaperio/recovery.py", "kaperio/converter.py", "kaperio/candidates.py",

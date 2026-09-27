@@ -361,7 +361,7 @@ async function passwordResultChecks(page, context, base, data) {
     const launch = JSON.parse(fs.readFileSync(path.join(data, 'launch.json'), 'utf8'));
     base = new URL(launch.url).origin;
     browser = await chromium.launch({channel: process.env.KAPERIO_BROWSER || 'msedge', headless: true});
-    context = await browser.newContext({viewport: {width: 1440, height: 1000}, serviceWorkers: 'block'});
+    context = await browser.newContext({viewport: {width: 1440, height: 1000}, serviceWorkers: 'block', locale: 'ja-JP'});
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -380,6 +380,7 @@ async function passwordResultChecks(page, context, base, data) {
     await page.locator('#settings-dialog').waitFor({state:'hidden'});
     await page.locator('#files').setInputFiles(source);
     await page.locator('#document-name').filter({hasText: 'Sample.pdf'}).waitFor();
+    await require('./i18n-smoke.cjs')(page,context,base,data);
     assert.equal(await page.locator('#recover-mode').getAttribute('aria-pressed'),'true');
     assert.equal(await page.locator('#known-form').isVisible(),false);
     assert.equal(await page.locator('#approach').inputValue(),'automatic');
@@ -444,6 +445,12 @@ async function passwordResultChecks(page, context, base, data) {
     await page.locator('#known-form button[type=submit]').click();
     await page.locator('#ready-state').waitFor();
     await passwordResultChecks(page,context,base,data);
+    await page.locator('#language').selectOption('en');
+    await page.waitForFunction(()=>document.documentElement.lang==='en'&&!document.getElementById('language').disabled);
+    assert.equal(await page.locator('#password-result').inputValue(),'Test42');
+    assert.equal(await page.locator('#copy-password').innerText(),'Copy');
+    await page.locator('#language').selectOption('ja');
+    await page.waitForFunction(()=>document.documentElement.lang==='ja'&&!document.getElementById('language').disabled);
     await page.waitForFunction(() => document.getElementById('page-image').naturalWidth > 0);
     await page.route('**/api/jobs/*/preview?*', route=>route.fulfill({status:400,json:{error:'Synthetic preview busy'}}));
     await page.locator('#refresh-preview').click();
