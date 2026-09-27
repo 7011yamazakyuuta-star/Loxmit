@@ -1,117 +1,133 @@
-# Loxmit
+# Loxmit User Guide
 
-個人のファイルを開封し、パスワードなしで保存するローカルアプリです。Hashcatを復元エンジンとして使います。原本は変更しません。
+English | [日本語](README.ja.md) | [Project overview](../README.md)
 
-## デスクトップ版
+Use Loxmit only with your own files or explicit permission from their owner.
+Recovery is not guaranteed. Keep your originals and check exported copies.
 
-Windows EXE、macOS Apple Silicon/Intel用 `.app`、Linux x86-64実行ファイルは
-[GitHub Releases](https://github.com/7011yamazakyuuta-star/Loxmit/releases)で配布します。
-ZIPまたはtar.gzを展開し、Loxmitを起動します。同梱フォルダーはすべて必要です。
-Pythonは不要です。画面は既定ブラウザーで開きます。
-初回ガイドで同意すると、Windows x64では公式Hashcatを自動ダウンロード、
-macOS 15以降（Apple Silicon／Intel）とLinux x86-64では同梱Hashcatを自動展開します。
-ドライバー、Homebrew、CUDA Toolkit一式は導入しません。GPUの認識診断に加え、任意の計算テストでテスト用PDFの照合を確認できます。速度テストではありません。
-任意のNVRTC自動追加はWindows x64のみです。ZIP探索用zip2johnは手動設定です。
-[初回準備の詳細](docs/SETUP.md)を参照してください。
-署名・公証、実機検証、保存先の詳細は[デスクトップ配布](docs/DESKTOP.md)を参照してください。
+## Desktop Setup
 
-## Windowsでソース版の初回セットアップ
+Extract a matching [release](https://github.com/7011yamazakyuuta-star/Loxmit/releases).
+Keep all package files together. Launch `Loxmit.exe` on Windows, `Loxmit.app` on
+macOS, or `Loxmit/Loxmit` on Linux. Python is included in desktop packages.
 
-Python 3.12以降を [公式サイト](https://www.python.org/downloads/) からインストールします。
-公開ZIPを展開し、ルートの `Setup.cmd` を実行します。ネット接続が必要です。
-管理者権限は通常不要です。Windowsで検証したPythonは64bit版3.12です。
+The interface opens in your browser with an empty library. The first-run guide
+never installs components or runs GPU computation without your action. Windows
+setup downloads pinned official Hashcat after consent. macOS 15+ and Linux x64
+desktop builds extract bundled Hashcat after consent. Drivers, Homebrew, John,
+Office, and the full CUDA toolkit are not installed. Optional NVRTC setup is
+Windows x64 only. See [setup](docs/SETUP.md) and [packaging](docs/DESKTOP.md).
 
-Hashcat探索には [Hashcat公式](https://hashcat.net/hashcat/) の配布一式を展開し、
-起動後の設定画面で `hashcat.exe` を指定します。ZIP探索には
-[John公式](https://www.openwall.com/john/) の配布一式の `zip2john.exe` も指定します。
-ソースZIPにエンジン・DLLは含みません。Windowsでは初回ガイドからのHashcat自動導入も利用できます。
-既知パスワードの解除・保存だけなら、Hashcat/Johnの導入は不要です。
+Packages are unsigned and not notarized. An OS warning does not establish that
+a package is safe; review its source, release notes, and checksums.
 
-## 起動
+## Language
 
-ワークスペース直下の `Loxmit.cmd` をダブルクリックします。ブラウザーが開きます。ファイルを追加し、既知パスワードの入力または探索を選択します。終了は画面右上の電源ボタンです。タブを閉じただけでは処理を継続します。
+Select **English**, **日本語**, or **Browser default** in the top bar. Browser
+default chooses Japanese when the preferred browser language is Japanese,
+otherwise English. The preference survives restarts and port changes. Switching
+does not restart jobs or clear input. Filenames, hints, contents, and passwords
+are not translated. External tool logs and unexpected third-party errors stay
+in their original language. No translation service or external AI is used.
 
-MITライセンスのアルファ版です。ソース版は `../outputs/kaperio/` に作業用コピーと出力を保存します。
-初期状態は空のライブラリーです。1ファイルの取込上限は200 MiBです。処理時のメモリーや空き容量が200 MiBで済むという意味ではありません。
+## Open and Save
 
-## 対応範囲
+1. Add your file. The limit is **200 MiB per file**; RAM and temporary storage
+   needs can be much higher. The source is copied, not modified.
+2. Choose **I know the password** for direct unlocking, or **Find password**
+   for recovery. Direct unlocking does not need Hashcat or John.
+3. Automatic search accepts remembered phrases, numbers, lengths, and known
+   beginnings/endings. Leave uncertain details unknown. It is a bounded,
+   prioritized search, not an unlimited search of every password.
+4. After a verified result, copy the password or **Save without password**.
+   The eye control hides the on-screen password. The displayed password is lost
+   after restart, but saved files remain.
+5. Use **Export** for conversion. Quit with the power button; closing the tab
+   does not stop processing.
 
-| 入力 | 開封・元形式保存 | Hashcat探索 | 変換 |
-|---|---|---|---|
-| PDF | 対応 | R2〜R6 / 10400〜10700 | PDF、画像PDF、画像Word、PNG ZIP、既存テキスト |
-| Excel .xlsx | 対応 | Office 2007/2010/2013系の認識可能な暗号 | PDF経由の画像化。OfficeまたはLibreOfficeが必要 |
-| PowerPoint .pptx | 対応 | 同上 | 同上 |
-| Word .docx | 対応 | 同上 | 同上 |
-| ZIP | パスワードなしZIPへ再圧縮 | WinZip AES / 認識可能なZipCrypto | 内容一覧とZIP保存 |
+## Supported Files
 
-Officeのシート保護・編集制限、旧形式の `.xls/.ppt/.doc`、7z、RAR、DRM・証明書方式は現在の対象外です。マクロ有効OOXMLの拡張子は読み込み可能ですが、専用の実ファイル検証は未実施です。すべてのZIP圧縮方式を保証しません。ZIP内でパスワードが混在すると全体の解除に失敗する場合があります。
+| Input | Unlock and save | Recovery | Conversion |
+| --- | --- | --- | --- |
+| PDF | Original format | Standard encryption R2-R6, modes 10400-10700 | Image PDF, page-image Word, PNG ZIP, existing text |
+| Excel `.xlsx` | Original format | Recognized Office 2007/2010/2013 encryption | Via PDF; Office or LibreOffice required |
+| PowerPoint `.pptx` | Original format | Same as Excel | Same as Excel |
+| Word `.docx` | Original format | Same as Excel | Same as Excel |
+| ZIP | Repack without password | Recognized WinZip AES / ZipCrypto, separate `zip2john` required | Entry list and unlocked ZIP |
 
-画像Wordは各ページを画像として配置します。文字を編集できるWordへのOCR変換ではありません。元形式のOffice解除では、復号した文書バイトをそのまま保存します。PDFの署名有効性を維持する機能ではありません。
+Not supported: Office sheet protection or editing restrictions, legacy
+`.xls/.ppt/.doc`, 7z, RAR, certificate encryption, or DRM. Macro-enabled OOXML
+extensions are accepted but dedicated real-file coverage is incomplete. ZIP
+compression methods and mixed-password archives are not universally supported.
 
-## 探索
+Word image export is not editable text or OCR. Text export uses the existing
+text layer and may retain encoding problems. Rewriting a PDF does not preserve
+digital signature validity. Unlocked Office bytes are saved without reformatting.
 
-- 初期選択はおまかせ探索です。覚えている単語、長さ、文字種などへの回答から候補を組み立てます。「覚えていない」も選べますが、全候補を無制限に試す機能ではありません。
-- 詳細指定では辞書、マスク、英字大小・末尾数字の変形、辞書＋末尾探索、先頭探索＋辞書、手掛かりからの段階探索の6種類に対応します。
-- マスクの文字数は固定文字を含む全体の長さです。先頭・末尾を固定して探索範囲を絞れます。辞書と組み合わせる探索では、文字数は辞書へ追加する部分の長さです。
-- 長さの設定範囲は1〜127文字です。形式ごとのUTF-8バイト制限・候補数制限が優先されます。16文字超の長い手掛かりにも対応しますが、長い総当たりが実用的になるわけではありません。候補リストはUTF-8、1行1候補です。
-- デバイスIDは設定のGPU診断で確認できます。空欄の場合はHashcatの自動選択です。
-- 初期値は低負荷、80°C停止、10分上限です。時間上限には初期化時間も含みます。
-- PDFの対応モードでは、変形・追加部分を含めて16 UTF-8バイト以下の段階に最適化カーネル `-O` を使います。PDF R6の混在辞書は短い基本候補が65,536件以上の場合だけ長短を分割し、長い候補も通常カーネルで試します。小さい辞書・他方式では分割による起動負担を避けます。Office・ZIPは通常カーネルを維持します。
-- 手掛かり探索は、入力候補、表記違い、指定数字・記号、任意の単語結合・誤入力候補の順です。単語は64件・各48バイト、数字等は32件・各16バイト、生成後は重複を除いて最大10万件です。上限超過はエラーにし、黙って切り捨てません。AI・外部送信・秘密の収集は行いません。
-- 負荷の自動測定は任意です。100万候補以上の段階、開始時の残り時間120秒以上で、負荷1・2・3を各2回、1試行12秒で比較します。測定時間も時間上限に含みます。温度警告・不安定な結果・10%未満の改善では負荷1を維持します。短い探索では測定しません。CUDAの導入・ドライバー変更・オーバークロックは行いません。
-- 完了した段階は再開時に省略します。現在の段階はHashcatの保存地点から再開します。候補・条件・Hashcat実行ファイル情報が変わった保存地点は拒否し、新しい探索を求めます。
-- 一時停止はプロセスを停止し、Hashcatの直近のrestoreファイルから再開します。保存後の一部候補を再試行する場合があります。保存地点がまだなければ最初から再試行することを画面に表示します。
-- GPU探索は1件ずつ順番に実行します。候補が見つからない場合は範囲内で未発見と表示します。強いパスワードの短時間復元を保証するものではありません。
+## Recovery Controls
 
-復元結果は実際に原本を復号し、出力を検証してから成功とします。パスワードは実行中のメモリーに保持します。Hashcatのpotfileは無効です。一時的な結果ファイルは読み取り後に削除します。再開のための候補リスト、ハッシュ、固定文字、元ファイルのコピー、解除済み文書はローカルに残ります。
+- Automatic mode prioritizes up to 10 million attempts per run. Phrase-derived
+  candidates have a separate 100,000-candidate cap. Review the displayed scope.
+- Manual mode offers clue-based stages, masks, candidate lists, rules, and
+  candidate/prefix/suffix combinations. Lists use UTF-8, one candidate per line.
+- Length accepts 1-127, but format-specific UTF-8 byte limits take precedence.
+  Non-ASCII characters may use several bytes. Long-clue support does not make
+  exhaustive long-password searches practical.
+- Defaults: low workload, 80°C stop threshold, 10-minute limit including startup.
+  Temperature monitoring depends on the driver. Optional workload tuning uses
+  the time budget and applies only to current candidates and hardware.
+- Pause stops the process. Resume uses the last valid checkpoint and may repeat
+  recent candidates. Without a checkpoint it restarts the current stage.
+- A candidate must actually unlock the source and pass output verification.
+  GPU recovery jobs run one at a time.
 
-成功後はパスワードを大きく表示し、コピーボタンで取得できます。目のボタンで隠すこともできます。アプリの再起動でパスワード表示は消えますが、保存済みの解除済みファイルは残ります。
+Settings detects existing executable paths or accepts Hashcat/zip2john paths.
+GPU detection lists devices; the separate opt-in compute test uses a synthetic
+PDF. It is not a speed benchmark or a guarantee for every file format.
 
-## OS
+## Storage and Security
 
-| OS | 状態 |
-|---|---|
-| Windows | このPCで実エンジン・ファイル変換・ブラウザー操作を検証 |
-| macOS | Apple Silicon・Intel別のネイティブ配布。ホスト型ランナーで起動・復号・変換を検証。実GPUは未検証 |
-| Linux | Ubuntu 22.04 x86-64でネイティブ配布と起動・復号・変換を検証。実GPU・他ディストリビューションは未検証 |
-| iOS / Android | PCを処理担当にするWeb/PWA画面。390px幅で検証、実機未検証 |
+Settings shows the data directory and an optional OS encryption check. The app
+does not enable encryption or retrieve recovery keys. An unknown result does
+not prove the disk is unencrypted. Stored work copies, candidates, hashes,
+checkpoints, previews, and exports have no app-level encryption.
 
-macOS / Linuxのソース版ではPython 3.12以降を準備し、`sh setup.sh`、`sh launch.sh` を実行します。ネイティブ配布版ではPython不要で、Hashcatは初回同意後に自動準備します。手動設定時の環境変数は `LOXMIT_HASHCAT`（旧 `KAPERIO_HASHCAT` も対応）です。ZIP探索にはそのOS用の `zip2john` を設定画面で指定するかPATHへ配置してください。Office画像化はLibreOfficeを使用します。Windows版の解析バイナリーをほかのOSで実行することはありません。
+Password results are held in memory. Transient result files are removed after
+ordinary completion/failure; abrupt failures can leave data. Library deletion
+does not remove originals, browser downloads, or backups and is not secure erasure.
+Unused identifiable temporary workspaces are conservatively cleaned on startup;
+unknown or potentially active data is kept.
 
-## スマホから操作
+Document resource limits are not an OS sandbox. Default access is token-protected
+loopback only. Do not share launch URLs: they grant control of the app.
+Experimental private-LAN HTTPS requires trusted certificates and manual setup.
+Do not expose Loxmit to the public internet. Standalone iOS/Android recovery is
+not implemented. Read [Security and Privacy](SECURITY.md).
 
-初期設定は `127.0.0.1` 限定です。LANには自動公開しません。スマホ連携用のHTTPSモードを用意しています。これは遠隔操作の基盤で、証明書の導入やスマホ実機確認を含むワンクリック設定は今後の項目です。
+## Run From Source
 
-端末側で信頼できる証明書を準備した環境で、例として次のように起動できます。
+Install Python 3.12+. On Windows, run root `Setup.cmd`, then `Loxmit.cmd`.
+On macOS/Linux, run `sh kaperio/setup.sh`, then `sh kaperio/launch.sh`.
+Setup downloads dependencies; administrator permissions are normally unnecessary.
+
+Source archives do not include Hashcat or native component packs. Configure an
+existing installation, use opt-in Windows setup, or build a pack as described
+in [desktop packaging](docs/DESKTOP.md). `LOXMIT_HASHCAT` and legacy
+`KAPERIO_HASHCAT` are supported. Internal paths remain compatible.
+
+From `kaperio/`, with the project's virtual environment activated:
 
 ```sh
-python app.py --host 192.168.1.20 --tls-cert /path/to/cert.pem --tls-key /path/to/key.pem
+python -m pip install -r requirements-dev.txt
+python -m unittest discover -s tests -v
+python scripts/build_desktop.py
 ```
 
-そのPC自身のプライベートIPv4を指定してください。HTTPのLAN公開やワイルドカード待受は拒否します。接続URLは `outputs/kaperio/launch.json` に保存される起動用URLです。URLに含むトークンは操作権限なので共有相手を限定してください。PCを再起動するとトークンは変わります。外部サービスへの文書アップロードは行いません。ルーターのポート開放や証明書検証無効化は不要な設計にしてください。
+Optional browser tests require Node.js, Playwright, and Edge (or set
+`KAPERIO_BROWSER`). Run `node tests/release-smoke.cjs`. Synthetic temporary
+libraries are deleted; a bounded set of screenshots remains. GPU integration
+tests are separate opt-in operations, not ordinary unit tests.
 
-ブラウザー画面とPWAはPC上のPython処理へ接続します。iPhoneやAndroid上でHashcat自体を実行するものではありません。iPhoneのMetalネイティブ処理は別途実装・実測が必要です。
-
-## 検証
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
-.\.venv\Scripts\python.exe tests\integration.py
-```
-
-統合テストは生成したOffice/PDF/ZIPを実際にHashcatで探索します。GPUを使う任意実行テストです。
-デバイス1、各探索1分以内を初期値とします。個人ファイルやDownloadsフォルダーは読みません。
-ZIP探索テストには別途zip2johnが必要です。通常の単体テストにGPUは不要です。
-
-任意の画面テストはNode.js、Playwright、Edgeの導入後に `node tests/release-smoke.cjs` で実行できます。
-生成文書だけを使い、エンジン未導入のクリーンな展開先を対象にします。
-既存環境を対象にする場合は第1引数に展開先のkaperioフォルダーを指定してください。
-
-先行ツール調査と改善候補は `docs/research.md`、実測記録は `docs/validation.md` を参照してください。
-
-## 公開・プライバシー
-
-`docs/DISTRIBUTION.md` の許可リスト方式でソースZIPを作成します。
-開発フォルダーや `outputs` を丸ごと共有しないでください。
-ライセンスは設定画面から閲覧できます。データ保存と制限は `SECURITY.md` を参照してください。
+Only `release-files.json` allowlisted files enter source archives. Never publish
+the whole workspace or local data directory. See [contributing](../CONTRIBUTING.md)
+and [third-party notices](THIRD_PARTY.md).

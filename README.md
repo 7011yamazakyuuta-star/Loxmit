@@ -1,69 +1,107 @@
 # Loxmit
 
-![Loxmit icon](kaperio/static/icon-64.png)
+English | [日本語](README.ja.md)
 
-自分のファイル、または所有者の許可があるファイルのパスワード復元と、解除済みファイルの保存を行うローカルアプリです。原本は変更しません。文書やパスワードを外部サービスへ送信しません。
+<img src="kaperio/static/icon-192.png" alt="Loxmit's pixel-art locksmith" width="96" height="96">
 
-**0.4.0-alpha.12** / MITライセンス / 旧名称 Kaperio / Hashcat公式製品ではありません。
+**Recover access to your own password-protected files. Keep the work local.**
 
-[ダウンロード](https://github.com/7011yamazakyuuta-star/Loxmit/releases) ·
-[使い方・対応形式](kaperio/README.md) ·
-[初回セットアップとGPU診断](kaperio/docs/SETUP.md)
+Loxmit is an open-source desktop app for authorized password recovery and saving
+unlocked copies of PDF, Office, and ZIP files. It uses Hashcat as its recovery
+engine and opens its interface in your browser. Original files are not modified;
+documents and passwords are not uploaded to a cloud service.
 
-alpha.9ではOfficeの展開量制限、LAN接続待ち対策、解析中の操作応答を改善し、文書解析を時間・メモリー制限付きの別プロセスに分離しています。[対策の範囲と制限](kaperio/docs/HARDENING.md)。公開済みパッケージの版と各OSの検証状況は、リリース説明を確認してください。
+**Alpha software.** Recovery is not guaranteed. This is an independent project,
+not an official Hashcat product or a replacement for its engine.
 
-alpha.10では一時パスワード結果の例外時削除、文書補助処理の一時出力の集約、入れ子の一時ファイルの容量・件数制限を追加しました。各OSの配布ビルドでは、実際に導入されたPython依存を既知の脆弱性情報と照合します。[監査の範囲と制限](kaperio/docs/PRIVACY_AUDIT.md)。
+[Download desktop app](https://github.com/7011yamazakyuuta-star/Loxmit/releases) ·
+[User guide](kaperio/README.md) · [Report a bug](https://github.com/7011yamazakyuuta-star/Loxmit/issues/new/choose) ·
+[Security and privacy](SECURITY.md)
 
-alpha.11では、設定の「保護状態」から保存先のOS暗号化を照会できます。設定変更・管理者権限の要求・回復キー取得は行いません。文書ワーカーの環境変数継承も制限しました。[保護範囲と未対応事項](kaperio/docs/SECURITY_READINESS.md)。正式な署名・公証のビルド経路は追加しましたが、証明書未取得のため、配布版は引き続き未署名・未公証です。[署名手順](kaperio/docs/SIGNING.md)。
+![Loxmit in English, showing a synthetic PDF and a clue-based search plan](kaperio/docs/interface-en.png)
 
-## はじめる
+*Example with a generated test file. The app starts with an empty library.*
 
-alpha.12では、中断した処理の状態を保存し直し、識別可能な未使用の一時データを起動時に整理します。GPU認識診断とは別に、同意後の短い計算テストを追加しました。検証用の大きな文書は通常のテスト終了時に削除します。[検証範囲と保持するデータ](kaperio/docs/RECOVERY_DIAGNOSTICS.md)。
+## Get Started
 
-配布ファイルを展開して起動します。Pythonは不要です。画面は既定ブラウザーで開きます。フォルダー内の部品を削除せず、まとめて保管してください。
+Download an archive from **Releases**, extract the entire folder, and launch
+Loxmit. Desktop packages include Python; you do not need to install it separately.
+Read the selected release's notes for its version and verification results.
 
-| OS | 配布ファイル末尾 | 起動 | Hashcatの準備 |
-|---|---|---|---|
-| Windows x64 | `windows-amd64.zip` | `Loxmit.exe` | 同意後、公式配布物を自動ダウンロード |
-| macOS 15以降・Apple Silicon | `darwin-arm64.zip` | `Loxmit.app` | 同意後、同梱部品を自動展開 |
-| macOS 15以降・Intel | `darwin-x86_64.zip` | `Loxmit.app` | 同意後、同梱部品を自動展開 |
-| Linux x86-64 | `linux-x86_64.tar.gz` | `Loxmit/Loxmit` | 同意後、同梱部品を自動展開 |
+| Platform | Archive suffix | Launch | Optional Hashcat setup |
+| --- | --- | --- | --- |
+| Windows x64 | `windows-amd64.zip` | `Loxmit.exe` | Download official package after consent |
+| macOS 15+, Apple Silicon | `darwin-arm64.zip` | `Loxmit.app` | Extract bundled build after consent |
+| macOS 15+, Intel | `darwin-x86_64.zip` | `Loxmit.app` | Extract bundled build after consent |
+| Linux x86-64 | `linux-x86_64.tar.gz` | `Loxmit/Loxmit` | Extract bundled build after consent |
 
-Linuxの検証対象はUbuntu 22.04、glibc 2.35以降です。macOS／Linuxの自動準備にHomebrew、管理者権限、開発用コンパイラーは不要です。GPUドライバーは導入・更新しません。GPUランタイムの利用可否は環境に依存します。
+Linux builds target Ubuntu 22.04 / glibc 2.35 or newer. Other distributions and
+GPU runtimes may require additional verification. GPU drivers are never installed
+or updated by Loxmit. Packages are currently **unsigned and not notarized**;
+do not disable OS security protections globally to run them. SHA-256 checksums
+help detect corruption but do not replace publisher signatures.
 
-1. 初回ガイドで必要な部品だけ準備し、GPU診断を実行します。既知パスワードで開く場合はHashcat不要です。
-2. 自分のファイルを追加し、「パスワードを探す」または「パスワードが分かる」を選びます。
-3. 復元されたパスワードをコピーするか、パスワードなしの文書を書き出します。
+1. Start with the empty library. The optional guide helps you check your GPU and
+   install only the components you approve.
+2. Add a file you own or have explicit permission to recover. Choose **Find
+   password** and enter remembered clues, or **I know the password** to unlock
+   directly. Known-password unlocking does not require Hashcat.
+3. Copy the recovered password and **Save without password**, or choose an export
+   format. Keep the original and review the exported copy.
 
-初期状態は空のライブラリーです。デモファイルは入りません。終了は右上の電源ボタンから行います。
+The interface supports **English and Japanese**, with a saved language selector.
+Browser language is used initially; other languages fall back to English.
+Tool-generated diagnostic logs remain verbatim. Quit with the power button;
+closing the browser tab alone does not stop the local process.
 
-## できること
+## Features and Limits
 
-- PDF・Excel・PowerPoint・Word・ZIPの対応する暗号形式の復元と解除。ZIP探索には別途 `zip2john` が必要です。
-- おまかせ探索で、覚えている単語・文字数・文字種から候補を作成。「覚えていない」回答にも対応します。
-- 詳細指定では辞書、マスク、変形、辞書とマスクの組合せ、段階探索に対応します。
-- 16文字超の候補にも対応。形式ごとのUTF-8バイト上限と候補数上限があります。
-- 1ファイル200 MiBまで取り込み。解除済みの元形式・画像PDF・画像Word・PNG・既存テキストを保存できます。変換対象は形式によります。
-- チュートリアル、GPU診断、一時停止・再開、温度と時間の上限、結果のコピー。
+| Area | Available | Important limits |
+| --- | --- | --- |
+| File types | PDF, `.xlsx`, `.pptx`, `.docx`, ZIP | Recognized encryption formats only; [format matrix](kaperio/README.md#supported-files) |
+| Recovery | Clue-first search, dictionaries, masks, rules, hybrid searches | ZIP recovery needs a separately configured `zip2john` |
+| Long passwords | Long clues and length settings above 16 characters | Encryption-specific byte limits apply; exhaustive long searches are not practical |
+| Export | Unlocked original format, image PDF, page-image Word, PNG ZIP, existing text | Depends on input; image Word is not editable OCR text |
+| Controls | Pause/resume, time and temperature limits, optional workload tuning | Resume may repeat candidates after the last checkpoint |
+| Diagnostics | GPU detection and an opt-in synthetic compute check | Detection, compute correctness, and speed are different tests |
+| Input size | Up to 200 MiB per file | Processing can need much more RAM and disk space |
 
-復元の成功や、本家Hashcatより高速という保証はありません。[速度検証の条件と限界](kaperio/docs/PERFORMANCE.md)を公開しています。画像Wordは編集可能なOCR文書ではありません。Officeの画像化にはOfficeまたはLibreOfficeが別途必要です。
+Office rendering requires a supported Office or LibreOffice installation.
+There is no claim that Loxmit is universally faster than upstream Hashcat. See
+[performance evidence and limits](kaperio/docs/PERFORMANCE.md).
 
-## 配布と検証
+## Privacy and Verification
 
-ストアは使わずGitHub Releasesで配布します。Windowsのコード署名、macOSのDeveloper ID署名・公証は未実施です。OSの警告が出る場合がありますが、セキュリティ機能を一括無効化しないでください。
+Work copies, candidate lists, hashes, checkpoints, and unlocked exports remain on
+your computer. These can be sensitive. **Loxmit does not encrypt its stored data.**
+Recovered passwords are displayed from memory and disappear after app restart;
+saved exports remain. Deleting a library entry is not secure erasure.
 
-GitHub Actionsでは4種類のネイティブアプリをビルドし、起動・復号・変換をテストします。macOS／Linuxでは同梱Hashcatの同意付き展開、バージョン照会、8種類の形式モジュール読込も検証します。**ビルド・起動成功と実GPUでの復元性能は別の確認です。** 結果は各リリースと[Actions](https://github.com/7011yamazakyuuta-star/Loxmit/actions/workflows/desktop.yml)で確認できます。
+The app uses a token-protected loopback server by default. Document workers have
+resource limits, but **not a full filesystem or network sandbox**. Treat unknown
+documents with caution. Optional private-LAN HTTPS is experimental; there is no
+standalone iOS or Android recovery app and no one-click remote setup.
 
-スマホ向けはPCを処理担当にするHTTPS遠隔操作の基盤のみです。iOS／Android単体の復元アプリや、ワンクリック接続は未提供です。
+[CI](https://github.com/7011yamazakyuuta-star/Loxmit/actions/workflows/desktop.yml)
+builds and smoke-tests four native packages. A successful hosted build is not
+evidence of physical GPU performance. Windows has local hardware test evidence;
+macOS/Linux physical GPU coverage remains limited. Consult each release's notes,
+[desktop verification](kaperio/docs/DESKTOP.md), and
+[recovery diagnostics](kaperio/docs/RECOVERY_DIAGNOSTICS.md).
 
-## 開発と安全性
+## Contribute
 
-ソース版はPython 3.12以降が必要です。Windowsでは `Setup.cmd` → `Loxmit.cmd`、macOS／Linuxでは `kaperio/setup.sh` → `kaperio/launch.sh` を使います。ソース版のネイティブHashcat部品は別途ビルドまたは手動設定します。
+Bug reports, translations, and reproducible platform reports are welcome in
+**English or Japanese**. Use synthetic sample files, never private documents,
+passwords, hashes, or launch URLs. See [contribution guide](CONTRIBUTING.md).
+Sensitive vulnerabilities belong in [private security reports](https://github.com/7011yamazakyuuta-star/Loxmit/security/advisories/new), not public issues.
 
-内部の `kaperio/` フォルダー、旧ランチャー、旧環境変数・保存場所には互換性を残しています。GitHubのリポジトリ名と公開製品名は **Loxmit** です。既存の個人データを勝手に移動・削除しません。
+For source setup, use Python 3.12+ and follow the [user/developer guide](kaperio/README.md#run-from-source).
+The internal `kaperio/` directory and legacy launchers remain for compatibility;
+the public product and repository name is **Loxmit**.
 
-解除済み文書は暗号化されていません。保存先を適切に管理してください。パスワードの画面表示は一時的で、アプリ再起動時に消えます。
+## License
 
-[ライセンス](LICENSE) · [第三者表示](kaperio/THIRD_PARTY.md) ·
-[安全性](kaperio/SECURITY.md) · [配布・検証の詳細](kaperio/docs/DESKTOP.md) ·
-[ソース配布手順](kaperio/docs/DISTRIBUTION.md)
+[MIT](LICENSE) for Loxmit. External tools and bundled components retain their own
+[licenses and notices](kaperio/THIRD_PARTY.md). The software license does not grant
+permission to access someone else's files.

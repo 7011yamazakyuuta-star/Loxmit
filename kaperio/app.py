@@ -136,6 +136,11 @@ class Library:
         except (OSError, ValueError):
             settings = {}
         self.zip2john = None if settings.get('zip2john') == '' else discover_zip2john(settings.get('zip2john'))
+        try:
+            language = json.loads((self.root / 'language.json').read_text(encoding='utf-8')).get('language')
+        except (OSError, ValueError, AttributeError):
+            language = 'auto'
+        self.language = language if language in ('auto', 'ja', 'en') else 'auto'
         for path in self.root.glob('*/job.json'):
             try:
                 if (path.is_symlink() or path.parent.is_symlink()
@@ -191,6 +196,14 @@ class Library:
                     'hashcat_configured': bool(self.hashcat and self.hashcat.is_file()),
                     'zip2john_configured': bool(self.zip2john and self.zip2john.is_file()),
                     'settings_locked': self.setup.busy or any(j['state'] in {'preparing', 'recovering', 'queued', 'pausing'} for j in self.jobs.values())}
+
+    def save_language(self, data):
+        if set(data) != {'language'} or data['language'] not in ('auto', 'ja', 'en'):
+            raise ValueError('Invalid language preference')
+        with self.lock:
+            atomic_json(self.root / 'language.json', data)
+            self.language = data['language']
+        return {'language': self.language}
 
     def save_settings(self, data, _setup=False):
         with self.lock:
@@ -613,6 +626,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_data(200, dict(self.library.settings_snapshot(), connection=self.server.origin, tls=self.server.tls))
         elif path == '/api/setup':
             self.send_data(200, self.library.setup.snapshot())
+        elif path == '/api/language':
+            self.send_data(200, {'language': self.library.language})
         elif path == '/api/security':
             self.send_data(200, self.library.security.snapshot())
         elif path == '/api/licenses':
@@ -649,6 +664,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_data(404, {'error': '見つかりません。'})
         else:
             static = {'/': 'index.html', '/app.js': 'app.js', '/style.css': 'style.css', '/lucide.js': 'lucide.min.js',
+                      '/i18n.js': 'i18n.js', '/messages-en.js': 'messages-en.js',
                       '/manifest.webmanifest': 'manifest.webmanifest', '/service-worker.js': 'service-worker.js',
                       '/icon-192.png': 'icon-192.png', '/icon-512.png': 'icon-512.png',
                       '/icon-64.png': 'icon-64.png', '/favicon.ico': 'favicon.ico', '/setup.js': 'setup.js'}
@@ -700,7 +716,9 @@ class Handler(BaseHTTPRequestHandler):
             self.send_data(500, {'error': '処理に失敗しました: ' + str(exc)})
 
     def post_route(self, data):
-        if self.path.startswith('/api/setup/'):
+        if self.path == '/api/language':
+            self.send_data(200, self.library.save_language(data))
+        elif self.path.startswith('/api/setup/'):
             if not ipaddress.ip_address(self.client_address[0]).is_loopback:
                 raise ValueError('セットアップはこのPCから実行してください。')
             action = self.path.rsplit('/', 1)[-1]

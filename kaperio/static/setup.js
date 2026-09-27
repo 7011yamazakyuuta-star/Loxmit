@@ -29,7 +29,7 @@
     $('setup-compute-start').hidden=computing();
     $('setup-compute-cancel').hidden=!computing();
     $('setup-compute-cancel').disabled=pending||value.state==='cancelling';
-    $('setup-compute-result').textContent=value.state==='passed'?`計算確認済み：${value.device.name} / ${value.device.backend}（${value.seconds}秒・準備込み）`:value.message||'未実施';
+    $('setup-compute-result').textContent=value.state==='passed'?t`計算確認済み：${value.device.name} / ${value.device.backend}（${value.seconds}秒・準備込み）`:i18n.message(value.message)||t('未実施');
     $('setup-compute-result').classList.toggle('field-error',['error','timeout'].includes(value.state));
     $('setup-compute-details').hidden=!value.details;$('setup-compute-log').textContent=value.details||'';
   }
@@ -37,17 +37,17 @@
   function renderReport(report){
     const key=JSON.stringify([report,snapshot?.compute]);if(key===reportKey)return;reportKey=key;
     const root=$('setup-diagnostic-result');root.replaceChildren();
-    if(!report){root.append(el('p','muted','未診断'));$('setup-diagnostic-details').hidden=true;return}
+    if(!report){root.append(el('p','muted',t('未診断')));$('setup-diagnostic-details').hidden=true;return}
     const hardware=report.hardware,backend=report.backend;
-    const names={recognized:'HashcatでGPUを認識',cpu_only:'CPUのみを認識',missing:'Hashcat未設定',unavailable:'計算デバイスを確認できません',error:'Hashcatの照会に失敗'};
-    root.append(row('OSのGPU情報',hardware.status==='detected'?'ディスプレイアダプターを検出':'確認できませんでした'));
+    const names={recognized:t('HashcatでGPUを認識'),cpu_only:t('CPUのみを認識'),missing:t('Hashcat未設定'),unavailable:t('計算デバイスを確認できません'),error:t('Hashcatの照会に失敗')};
+    root.append(row(t('OSのGPU情報'),hardware.status==='detected'?t('ディスプレイアダプターを検出'):t('確認できませんでした')));
     const list=el('ul','diagnosis-devices');for(const device of hardware.devices)list.append(el('li','',device.name));root.append(list);
-    if(hardware.status!=='detected')root.append(el('p','setup-note','未検出でも、GPU非搭載とは限りません。権限や仮想環境によって確認できない場合があります。'));
-    root.append(row('探索エンジン',names[backend.status]||'未確認'));
+    if(hardware.status!=='detected')root.append(el('p','setup-note',t('未検出でも、GPU非搭載とは限りません。権限や仮想環境によって確認できない場合があります。')));
+    root.append(row(t('探索エンジン'),names[backend.status]||t('未確認')));
     const devices=el('ul','diagnosis-devices');
     for(const device of backend.devices)devices.append(el('li','',`${device.name} / ${device.backend} ${device.type}`));root.append(devices);
-    root.append(row('計算動作・速度',snapshot?.compute?.state==='passed'?'計算確認済み（速度は未測定）':'未検証（デバイス照会のみ）'));
-    if(backend.nvrtc_missing)root.append(el('p','setup-note','CUDA初期化に必要なNVRTCを確認できません。「追加部品」で導入可否を確認できます。'));
+    root.append(row(t('計算動作・速度'),snapshot?.compute?.state==='passed'?t('計算確認済み（速度は未測定）'):t('未検証（デバイス照会のみ）')));
+    if(backend.nvrtc_missing)root.append(el('p','setup-note',t('CUDA初期化に必要なNVRTCを確認できません。「追加部品」で導入可否を確認できます。')));
     $('setup-diagnostic-details').hidden=!backend.text;$('setup-diagnostic-log').textContent=backend.text||'';
   }
   function renderComponents(){
@@ -56,17 +56,17 @@
     for(const item of snapshot.components){
       const section=el('section','setup-component'),head=el('div','setup-component-heading');
       head.append(el('h4','',item.name),el('span','muted',item.version));section.append(head);
-      section.append(el('p','setup-note',item.id==='hashcat'?(item.delivery==='bundled'?'パスワード探索エンジン / 公式ソースからの同梱ビルド':'パスワード探索エンジン / 公式配布一式'): 'NVIDIA向け実行時コンパイラー / DLL 2個とライセンスのみ'));
-      if(item.id==='nvrtc')section.append(el('p','setup-note','CUDA実行用の任意部品です。OpenCLで利用できる場合は、追加せずに使うこともできます。'));
-      section.append(el('p','muted',`${item.delivery==='bundled'?'同梱済み・追加通信なし':'ダウンロード'} ${(item.size/1048576).toFixed(1)} MB`));
-      const license=el('a','',item.license);license.href=item.license_url;license.target='_blank';license.rel='noopener noreferrer';section.append(license);
-      if(item.reason)section.append(el('p','setup-note',item.reason));
+      section.append(el('p','setup-note',item.id==='hashcat'?(item.delivery==='bundled'?t('パスワード探索エンジン / 公式ソースからの同梱ビルド'):t('パスワード探索エンジン / 公式配布一式')): t('NVIDIA向け実行時コンパイラー / DLL 2個とライセンスのみ')));
+      if(item.id==='nvrtc')section.append(el('p','setup-note',t('CUDA実行用の任意部品です。OpenCLで利用できる場合は、追加せずに使うこともできます。')));
+      section.append(el('p','muted',`${t(item.delivery==='bundled'?'同梱済み・追加通信なし':'ダウンロード')} ${(item.size/1048576).toFixed(1)} MB`));
+      const license=el('a','',i18n.message(item.license));license.href=item.license_url;license.target='_blank';license.rel='noopener noreferrer';section.append(license);
+      if(item.reason)section.append(el('p','setup-note',i18n.message(item.reason)));
       const enabled=item.eligible&&!snapshot.locked&&!pending&&!active();
       if(item.eligible){
         const label=el('label','setup-consent'),check=el('input');check.type='checkbox';check.id='consent-'+item.id;check.disabled=!enabled;
-        label.append(check,el('span','',item.id==='nvrtc'?'NVIDIAの利用規約を確認し、同意してこの部品を導入する':'利用条件を確認し、この部品の導入を許可する'));
+        label.append(check,el('span','',item.id==='nvrtc'?t('NVIDIAの利用規約を確認し、同意してこの部品を導入する'):t('利用条件を確認し、この部品の導入を許可する')));
         section.append(label);
-        const button=el('button','primary');button.type='button';button.id='install-'+item.id;button.disabled=true;button.append(icon('download'),el('span','',item.name+'を導入'));
+        const button=el('button','primary');button.type='button';button.id='install-'+item.id;button.disabled=true;button.append(icon('download'),el('span','',t('{0}を導入',item.name)));
         check.onchange=()=>button.disabled=!enabled||!check.checked;
         button.onclick=()=>install(item.id);section.append(button);
       }
@@ -81,7 +81,7 @@
     $('setup-download-progress').value=progress.total?Math.min(100,progress.received/progress.total*100):0;
     $('setup-progress-text').textContent=`${(progress.received/1048576).toFixed(1)} / ${(progress.total/1048576).toFixed(1)} MB`;
     $('setup-cancel').disabled=progress.phase==='cancelling'||pending;
-    $('setup-operation-message').textContent=progress.message||'';
+    $('setup-operation-message').textContent=i18n.message(progress.message)||'';
     $('setup-operation-message').classList.toggle('field-error',progress.phase==='error');
     $('setup-check-again').hidden=progress.phase!=='complete';
     renderReport(snapshot.report);renderCompute();renderComponents();icons();
@@ -90,7 +90,7 @@
   async function refreshSetup(){try{snapshot=await api('/api/setup');render();schedule()}catch(error){failure(error)}}
   async function open(view='guide'){
     try{
-      if($('settings-dialog').open){if(settingsDirty()){toast('先に設定を保存してください。');return}$('settings-dialog').close()}
+      if($('settings-dialog').open){if(settingsDirty()){toast(t('先に設定を保存してください。'));return}$('settings-dialog').close()}
       snapshot=await api('/api/setup');clearError();tab(view);render();if(!$('setup-dialog').open)$('setup-dialog').showModal();schedule();
     }catch(error){toast(error.message)}
   }
@@ -104,7 +104,7 @@
     finally{pending=false;render();schedule()}
   }
   async function diagnose(){
-    pending=true;clearError();render();$('setup-diagnostic-result').replaceChildren(el('p','muted','GPUと探索エンジンを照会中…'));reportKey='';
+    pending=true;clearError();render();$('setup-diagnostic-result').replaceChildren(el('p','muted',t('GPUと探索エンジンを照会中…')));reportKey='';
     try{snapshot=await api('/api/setup/diagnose',{})}catch(error){failure(error)}finally{pending=false;render()}
   }
   for(const name of views){
@@ -123,5 +123,6 @@
     finally{pending=false;render();schedule()}
   }
   $('setup-compute-start').onclick=()=>compute();$('setup-compute-cancel').onclick=()=>compute(true);
-  api('/api/setup').then(result=>{if(!result.guide_seen)open()}).catch(()=>{});
+  document.addEventListener('loxmit-language',()=>{componentKey='';reportKey='';clearError();render()});
+  i18n.ready.then(()=>api('/api/setup')).then(result=>{if(!result.guide_seen)open()}).catch(()=>{});
 })();

@@ -2,222 +2,223 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Loxmit | ファイル復元</title><meta name="theme-color" content="#ffffff">
+  <title data-i18n="Loxmit | ファイル復元">Loxmit | ファイル復元</title><meta name="theme-color" content="#ffffff">
   <link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/icon-192.png"><link rel="stylesheet" href="/style.css">
-  <script defer src="/lucide.js"></script><script defer src="/app.js"></script><script defer src="/setup.js"></script>
+  <script defer src="/messages-en.js"></script><script defer src="/i18n.js"></script><script defer src="/lucide.js"></script><script defer src="/app.js"></script><script defer src="/setup.js"></script>
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="/" aria-label="Loxmit ホーム"><img src="/icon-64.png" width="44" height="44" alt=""><span>Loxmit</span></a>
-  <span class="local-status" id="connection-status"><i data-lucide="monitor"></i><span>ローカル動作</span></span>
+  <a class="brand" href="/" aria-label="Loxmit ホーム" data-i18n-aria-label="Loxmit ホーム"><img src="/icon-64.png" width="44" height="44" alt=""><span>Loxmit</span></a>
+  <span class="local-status" id="connection-status"><i data-lucide="monitor"></i><span><span data-i18n="ローカル動作">ローカル動作</span></span></span>
   <div class="top-actions">
-    <button class="icon quiet" id="guide-open" title="はじめに・GPU診断" aria-label="はじめに・GPU診断"><i data-lucide="circle-help"></i></button>
-    <button class="quiet" id="settings-open" title="設定" aria-label="設定"><i data-lucide="settings"></i><span>設定</span></button>
-    <button class="icon quiet" id="shutdown" title="アプリを終了" aria-label="アプリを終了"><i data-lucide="power"></i></button>
+    <label class="language-control"><i data-lucide="languages" aria-hidden="true"></i><span class="sr-only" data-i18n="言語">言語</span><select id="language"><option value="auto" data-i18n="ブラウザーに合わせる">ブラウザーに合わせる</option><option value="ja" lang="ja">日本語</option><option value="en" lang="en">English</option></select></label>
+    <button class="icon quiet" id="guide-open" title="はじめに・GPU診断" aria-label="はじめに・GPU診断" data-i18n-title="はじめに・GPU診断" data-i18n-aria-label="はじめに・GPU診断"><i data-lucide="circle-help"></i></button>
+    <button class="quiet" id="settings-open" title="設定" aria-label="設定" data-i18n-title="設定" data-i18n-aria-label="設定"><i data-lucide="settings"></i><span><span data-i18n="設定">設定</span></span></button>
+    <button class="icon quiet" id="shutdown" title="アプリを終了" aria-label="アプリを終了" data-i18n-title="アプリを終了" data-i18n-aria-label="アプリを終了"><i data-lucide="power"></i></button>
   </div>
 </header>
 <div class="workspace">
   <aside class="library">
     <div class="library-tools">
-      <button id="add-files"><i data-lucide="plus"></i>ファイル追加</button>
+      <button id="add-files"><i data-lucide="plus"></i><span data-i18n="ファイル追加">ファイル追加</span></button>
       <input id="files" type="file" accept=".pdf,.xlsx,.pptx,.docx,.xlsm,.pptm,.docm,.zip" multiple hidden>
-      <label class="search"><i data-lucide="search"></i><input id="search" placeholder="検索" aria-label="ファイル名で検索"></label>
-      <div class="filter-bar"><h1>ファイル <span id="file-count">0</span></h1><select id="filter" aria-label="状態で絞り込み"><option value="all">すべて</option><option value="locked">未解除</option><option value="ready">開封済み</option><option value="active">処理中</option></select></div>
+      <label class="search"><i data-lucide="search"></i><input id="search" placeholder="検索" aria-label="ファイル名で検索" data-i18n-placeholder="検索" data-i18n-aria-label="ファイル名で検索"></label>
+      <div class="filter-bar"><h1><span data-i18n="ファイル ">ファイル </span><span id="file-count">0</span></h1><select id="filter" aria-label="状態で絞り込み" data-i18n-aria-label="状態で絞り込み"><option value="all" data-i18n="すべて">すべて</option><option value="locked" data-i18n="未解除">未解除</option><option value="ready" data-i18n="開封済み">開封済み</option><option value="active" data-i18n="処理中">処理中</option></select></div>
     </div>
-    <nav id="file-list" aria-label="ファイル一覧"></nav>
-    <div class="library-footer"><i data-lucide="hard-drive"></i><span>このPCに保存</span><span class="version">v0.4</span></div>
+    <nav id="file-list" aria-label="ファイル一覧" data-i18n-aria-label="ファイル一覧"></nav>
+    <div class="library-footer"><i data-lucide="hard-drive"></i><span><span data-i18n="このPCに保存">このPCに保存</span></span><span class="version">v0.4</span></div>
   </aside>
   <main id="main">
-    <section id="empty"><img src="/icon-192.png" width="116" height="116" alt=""><h2>ファイルを追加</h2><button class="primary" id="empty-add"><i data-lucide="plus"></i>ファイルを選択</button><span class="muted">PDF・Excel・PowerPoint・Word・ZIP / 最大200MB</span></section>
+    <section id="empty"><img src="/icon-192.png" width="116" height="116" alt=""><h2><span data-i18n="ファイルを追加">ファイルを追加</span></h2><button class="primary" id="empty-add"><i data-lucide="plus"></i><span data-i18n="ファイルを選択">ファイルを選択</span></button><span class="muted"><span data-i18n="PDF・Excel・PowerPoint・Word・ZIP / 最大200MB">PDF・Excel・PowerPoint・Word・ZIP / 最大200MB</span></span></section>
     <div id="document" hidden>
       <div class="document-layout">
         <section class="operations">
           <header class="document-heading">
             <span id="document-icon" class="file-symbol" aria-hidden="true"></span>
             <div class="document-title"><h2 id="document-name"></h2><div class="document-meta"><span id="document-type"></span><span id="document-size"></span><span id="document-pages"></span><span id="document-encryption"></span></div></div>
-            <button class="icon quiet" id="remove-file" title="ライブラリから削除" aria-label="ライブラリから削除"><i data-lucide="trash-2"></i></button>
+            <button class="icon quiet" id="remove-file" title="ライブラリから削除" aria-label="ライブラリから削除" data-i18n-title="ライブラリから削除" data-i18n-aria-label="ライブラリから削除"><i data-lucide="trash-2"></i></button>
           </header>
-          <div class="tabs" role="tablist" aria-label="ファイル操作">
-            <button id="tab-unlock" role="tab" aria-controls="unlock-panel" aria-selected="true">ロックを解除</button>
-            <button id="tab-export" role="tab" aria-controls="export-panel" aria-selected="false" tabindex="-1">書き出し</button>
+          <div class="tabs" role="tablist" aria-label="ファイル操作" data-i18n-aria-label="ファイル操作">
+            <button id="tab-unlock" role="tab" aria-controls="unlock-panel" aria-selected="true"><span data-i18n="ロックを解除">ロックを解除</span></button>
+            <button id="tab-export" role="tab" aria-controls="export-panel" aria-selected="false" tabindex="-1"><span data-i18n="書き出し">書き出し</span></button>
           </div>
           <div id="unlock-panel" role="tabpanel" aria-labelledby="tab-unlock">
             <div id="ready-state" hidden>
-              <div class="success-title"><i data-lucide="check"></i><h3>ロック解除完了</h3></div>
+              <div class="success-title"><i data-lucide="check"></i><h3><span data-i18n="ロック解除完了">ロック解除完了</span></h3></div>
               <section id="password-result-panel" class="password-result-panel" aria-labelledby="password-result-label" hidden>
-                <label id="password-result-label" for="password-result">開封に使ったパスワード</label>
+                <label id="password-result-label" for="password-result"><span data-i18n="開封に使ったパスワード">開封に使ったパスワード</span></label>
                 <div class="password-result-row">
-                  <div class="password-result-field"><input id="password-result" type="text" readonly autocomplete="off" spellcheck="false" aria-describedby="password-feedback"><button type="button" class="icon quiet" id="reveal-password" title="パスワードを隠す" aria-label="パスワードを隠す"><i data-lucide="eye-off"></i></button></div>
-                  <button type="button" id="copy-password"><i data-lucide="copy"></i><span>コピー</span></button>
+                  <div class="password-result-field"><input id="password-result" type="text" readonly autocomplete="off" spellcheck="false" aria-describedby="password-feedback"><button type="button" class="icon quiet" id="reveal-password" title="パスワードを隠す" aria-label="パスワードを隠す" data-i18n-title="パスワードを隠す" data-i18n-aria-label="パスワードを隠す"><i data-lucide="eye-off"></i></button></div>
+                  <button type="button" id="copy-password"><i data-lucide="copy"></i><span><span data-i18n="コピー">コピー</span></span></button>
                 </div>
-                <div class="password-result-status"><span id="password-feedback" role="status" aria-live="polite"></span><button type="button" id="retry-password" class="quiet" hidden><i data-lucide="rotate-cw"></i>再取得</button></div>
+                <div class="password-result-status"><span id="password-feedback" role="status" aria-live="polite"></span><button type="button" id="retry-password" class="quiet" hidden><i data-lucide="rotate-cw"></i><span data-i18n="再取得">再取得</span></button></div>
               </section>
-              <div class="inline-actions"><a class="primary" id="unlocked-download"><i data-lucide="download"></i><span id="download-label">パスワードなしで保存</span></a></div>
+              <div class="inline-actions"><a class="primary" id="unlocked-download"><i data-lucide="download"></i><span id="download-label"><span data-i18n="パスワードなしで保存">パスワードなしで保存</span></span></a></div>
             </div>
             <div id="locked-state">
-              <div class="segmented" role="group" aria-label="パスワードの状況"><button id="recover-mode" class="selected" aria-pressed="true">パスワードを探す</button><button id="known-mode" aria-pressed="false">パスワードが分かる</button></div>
+              <div class="segmented" role="group" aria-label="パスワードの状況" data-i18n-aria-label="パスワードの状況"><button id="recover-mode" class="selected" aria-pressed="true"><span data-i18n="パスワードを探す">パスワードを探す</span></button><button id="known-mode" aria-pressed="false"><span data-i18n="パスワードが分かる">パスワードが分かる</span></button></div>
               <form id="known-form" hidden>
-                <label for="password">分かっているパスワード</label>
-                <div class="password-field"><input id="password" type="password" autocomplete="off"><button type="button" class="icon quiet" id="toggle-password" title="表示を切り替え" aria-label="パスワード表示を切り替え"><i data-lucide="eye"></i></button></div>
-                <button class="primary form-submit" type="submit"><i data-lucide="lock-keyhole-open"></i>ロックを解除して保存</button>
+                <label for="password"><span data-i18n="分かっているパスワード">分かっているパスワード</span></label>
+                <div class="password-field"><input id="password" type="password" autocomplete="off"><button type="button" class="icon quiet" id="toggle-password" title="表示を切り替え" aria-label="パスワード表示を切り替え" data-i18n-title="表示を切り替え" data-i18n-aria-label="パスワード表示を切り替え"><i data-lucide="eye"></i></button></div>
+                <button class="primary form-submit" type="submit"><i data-lucide="lock-keyhole-open"></i><span data-i18n="ロックを解除して保存">ロックを解除して保存</span></button>
               </form>
               <div id="run-summary" hidden>
-                <div class="section-heading"><h3>今回の探索内容</h3><span class="muted" id="summary-caption">実行中の設定</span><button class="icon quiet" id="edit-plan" title="探索条件を変更" aria-label="探索条件を変更"><i data-lucide="pencil"></i></button></div>
+                <div class="section-heading"><h3><span data-i18n="今回の探索内容">今回の探索内容</span></h3><span class="muted" id="summary-caption"><span data-i18n="実行中の設定">実行中の設定</span></span><button class="icon quiet" id="edit-plan" title="探索条件を変更" aria-label="探索条件を変更" data-i18n-title="探索条件を変更" data-i18n-aria-label="探索条件を変更"><i data-lucide="pencil"></i></button></div>
                 <dl id="plan-summary" class="definition-list"></dl>
                 <div id="summary-notes" class="plan-notes"></div>
-                <details id="run-options"><summary><i data-lucide="chevron-right"></i>GPU・実行設定</summary><dl id="run-options-list" class="definition-list"></dl></details>
+                <details id="run-options"><summary><i data-lucide="chevron-right"></i><span data-i18n="GPU・実行設定">GPU・実行設定</span></summary><dl id="run-options-list" class="definition-list"></dl></details>
               </div>
               <form id="recovery-form">
-                <div class="recovery-heading"><h3>覚えていること</h3><label class="approach-label"><span class="sr-only">探し方</span><select id="approach"><option value="automatic">おまかせ</option><option value="manual">手動で設定</option></select></label></div>
-                <div id="manual-strategy" hidden><label for="strategy">探し方</label>
-                <select id="strategy"><option value="guided">手掛かりから順に探索</option><option value="mask">文字数・文字種から探索</option><option value="dictionary">候補リストから探索</option><option value="dictionary_rules">候補＋英字大小・末尾数字</option><option value="hybrid_suffix">候補＋末尾の文字探索</option><option value="hybrid_prefix">先頭の文字探索＋候補</option></select>
+                <div class="recovery-heading"><h3><span data-i18n="覚えていること">覚えていること</span></h3><label class="approach-label"><span class="sr-only"><span data-i18n="探し方">探し方</span></span><select id="approach"><option value="automatic" data-i18n="おまかせ">おまかせ</option><option value="manual" data-i18n="手動で設定">手動で設定</option></select></label></div>
+                <div id="manual-strategy" hidden><label for="strategy"><span data-i18n="探し方">探し方</span></label>
+                <select id="strategy"><option value="guided" data-i18n="手掛かりから順に探索">手掛かりから順に探索</option><option value="mask" data-i18n="文字数・文字種から探索">文字数・文字種から探索</option><option value="dictionary" data-i18n="候補リストから探索">候補リストから探索</option><option value="dictionary_rules" data-i18n="候補＋英字大小・末尾数字">候補＋英字大小・末尾数字</option><option value="hybrid_suffix" data-i18n="候補＋末尾の文字探索">候補＋末尾の文字探索</option><option value="hybrid_prefix" data-i18n="先頭の文字探索＋候補">先頭の文字探索＋候補</option></select>
                 </div>
                 <div id="mask-fields" hidden>
-                  <div class="field-row"><label><span id="min-label">最小文字数</span><input id="min-length" type="number" min="1" max="127" value="4"></label><label><span id="max-label">最大文字数</span><input id="max-length" type="number" min="1" max="127" value="6"></label></div>
-                  <fieldset class="charset"><legend>文字種</legend><label><input type="checkbox" name="charset" value="lower" checked>英小文字 a–z</label><label><input type="checkbox" name="charset" value="upper" checked>英大文字 A–Z</label><label><input type="checkbox" name="charset" value="digits" checked>数字 0–9</label><label><input type="checkbox" name="charset" value="symbols">記号</label></fieldset>
-                  <div class="field-row" id="fixed-fields"><label>先頭の固定文字<input id="prefix" maxlength="127" autocomplete="off"></label><label>末尾の固定文字<input id="suffix" maxlength="127" autocomplete="off"></label></div>
+                  <div class="field-row"><label><span id="min-label"><span data-i18n="最小文字数">最小文字数</span></span><input id="min-length" type="number" min="1" max="127" value="4"></label><label><span id="max-label"><span data-i18n="最大文字数">最大文字数</span></span><input id="max-length" type="number" min="1" max="127" value="6"></label></div>
+                  <fieldset class="charset"><legend><span data-i18n="文字種">文字種</span></legend><label><input type="checkbox" name="charset" value="lower" checked><span data-i18n="英小文字 a–z">英小文字 a–z</span></label><label><input type="checkbox" name="charset" value="upper" checked><span data-i18n="英大文字 A–Z">英大文字 A–Z</span></label><label><input type="checkbox" name="charset" value="digits" checked><span data-i18n="数字 0–9">数字 0–9</span></label><label><input type="checkbox" name="charset" value="symbols"><span data-i18n="記号">記号</span></label></fieldset>
+                  <div class="field-row" id="fixed-fields"><label><span data-i18n="先頭の固定文字">先頭の固定文字</span><input id="prefix" maxlength="127" autocomplete="off"></label><label><span data-i18n="末尾の固定文字">末尾の固定文字</span><input id="suffix" maxlength="127" autocomplete="off"></label></div>
                 </div>
                 <div id="dictionary-fields">
-                  <div class="label-row"><label for="words">心当たりのある語句は？ <span class="muted">任意・1行1件</span></label><button class="icon quiet" type="button" id="load-words" title="UTF-8テキストを読み込み" aria-label="候補リストを読み込み"><i data-lucide="upload"></i></button></div>
-                  <input id="word-file" type="file" accept=".txt,.dic" hidden><textarea id="words" rows="3" spellcheck="false" autocomplete="off" placeholder="名前、単語、よく使うフレーズなど"></textarea>
+                  <div class="label-row"><label for="words"><span data-i18n="心当たりのある語句は？ ">心当たりのある語句は？ </span><span class="muted"><span data-i18n="任意・1行1件">任意・1行1件</span></span></label><button class="icon quiet" type="button" id="load-words" title="UTF-8テキストを読み込み" aria-label="候補リストを読み込み" data-i18n-title="UTF-8テキストを読み込み" data-i18n-aria-label="候補リストを読み込み"><i data-lucide="upload"></i></button></div>
+                  <input id="word-file" type="file" accept=".txt,.dic" hidden><textarea id="words" rows="3" spellcheck="false" autocomplete="off" placeholder="名前、単語、よく使うフレーズなど" data-i18n-placeholder="名前、単語、よく使うフレーズなど"></textarea>
                 </div>
                 <div id="guided-fields">
-                  <label>心当たりのある数字・年は？ <span class="muted">任意・1行1件</span><textarea id="hint-numbers" rows="2" spellcheck="false" autocomplete="off" placeholder="年、日付、よく使う数字など"></textarea></label>
-                  <div id="guided-options" hidden><label>追加する記号<input id="hint-symbols" value="!_" maxlength="8" autocomplete="off"></label><fieldset class="charset"><legend>追加候補</legend><label><input id="hint-combine" type="checkbox">単語の結合</label><label><input id="hint-typos" type="checkbox">脱字・隣接文字の入れ替え</label></fieldset></div>
+                  <label><span data-i18n="心当たりのある数字・年は？ ">心当たりのある数字・年は？ </span><span class="muted"><span data-i18n="任意・1行1件">任意・1行1件</span></span><textarea id="hint-numbers" rows="2" spellcheck="false" autocomplete="off" placeholder="年、日付、よく使う数字など" data-i18n-placeholder="年、日付、よく使う数字など"></textarea></label>
+                  <div id="guided-options" hidden><label><span data-i18n="追加する記号">追加する記号</span><input id="hint-symbols" value="!_" maxlength="8" autocomplete="off"></label><fieldset class="charset"><legend><span data-i18n="追加候補">追加候補</span></legend><label><input id="hint-combine" type="checkbox"><span data-i18n="単語の結合">単語の結合</span></label><label><input id="hint-typos" type="checkbox"><span data-i18n="脱字・隣接文字の入れ替え">脱字・隣接文字の入れ替え</span></label></fieldset></div>
                 </div>
                 <div id="auto-questions">
-                  <div class="field-row interview-row"><label>文字数を覚えていますか？<select id="remember-length"><option value="unknown">分からない</option><option value="range">長さを指定する</option></select></label><label>不明な部分の文字種は？<select id="remember-characters"><option value="unknown">分からない</option><option value="digits">数字だけ</option><option value="lower">英小文字だけ</option><option value="alnum">英字と数字</option><option value="all">英字・数字・記号</option></select></label></div>
-                  <div class="field-row" id="remember-range" hidden><label>最小文字数<input id="remember-min" type="number" value="8" min="1" max="127"></label><label>最大文字数<input id="remember-max" type="number" value="20" min="1" max="127"></label></div>
-                  <details><summary><i data-lucide="chevron-right"></i>確かに覚えている先頭・末尾</summary><div class="field-row"><label>先頭の文字<input id="remember-prefix" maxlength="127" autocomplete="off"></label><label>末尾の文字<input id="remember-suffix" maxlength="127" autocomplete="off"></label></div></details>
+                  <div class="field-row interview-row"><label><span data-i18n="文字数を覚えていますか？">文字数を覚えていますか？</span><select id="remember-length"><option value="unknown" data-i18n="分からない">分からない</option><option value="range" data-i18n="長さを指定する">長さを指定する</option></select></label><label><span data-i18n="不明な部分の文字種は？">不明な部分の文字種は？</span><select id="remember-characters"><option value="unknown" data-i18n="分からない">分からない</option><option value="digits" data-i18n="数字だけ">数字だけ</option><option value="lower" data-i18n="英小文字だけ">英小文字だけ</option><option value="alnum" data-i18n="英字と数字">英字と数字</option><option value="all" data-i18n="英字・数字・記号">英字・数字・記号</option></select></label></div>
+                  <div class="field-row" id="remember-range" hidden><label><span data-i18n="最小文字数">最小文字数</span><input id="remember-min" type="number" value="8" min="1" max="127"></label><label><span data-i18n="最大文字数">最大文字数</span><input id="remember-max" type="number" value="20" min="1" max="127"></label></div>
+                  <details><summary><i data-lucide="chevron-right"></i><span data-i18n="確かに覚えている先頭・末尾">確かに覚えている先頭・末尾</span></summary><div class="field-row"><label><span data-i18n="先頭の文字">先頭の文字</span><input id="remember-prefix" maxlength="127" autocomplete="off"></label><label><span data-i18n="末尾の文字">末尾の文字</span><input id="remember-suffix" maxlength="127" autocomplete="off"></label></div></details>
                 </div>
-                <section class="search-preview" aria-labelledby="search-preview-title"><div class="estimate"><h4 id="search-preview-title">今回試す範囲</h4><strong id="candidate-count" aria-live="polite">—</strong></div><ol id="hint-summary" class="plan-stages"></ol><div id="plan-notes" class="plan-notes" role="status"></div></section>
-                <details><summary><i data-lucide="chevron-right"></i>GPU・実行設定</summary>
-                  <div class="field-row"><label>停止温度（°C）<input id="temperature" type="number" value="80" min="60" max="90"></label></div>
-                  <div class="field-row"><label>GPU負荷<select id="workload"><option value="1">低負荷</option><option value="2">標準</option><option value="3">高負荷</option><option value="auto">自動測定（低〜高負荷）</option></select></label><label>カーネル<select id="kernel"><option value="auto">自動最適化</option><option value="pure">標準カーネル</option></select></label></div>
-                  <label for="devices">デバイスID（空欄で自動）</label><input id="devices" placeholder="1" inputmode="numeric">
+                <section class="search-preview" aria-labelledby="search-preview-title"><div class="estimate"><h4 id="search-preview-title"><span data-i18n="今回試す範囲">今回試す範囲</span></h4><strong id="candidate-count" aria-live="polite">—</strong></div><ol id="hint-summary" class="plan-stages"></ol><div id="plan-notes" class="plan-notes" role="status"></div></section>
+                <details><summary><i data-lucide="chevron-right"></i><span data-i18n="GPU・実行設定">GPU・実行設定</span></summary>
+                  <div class="field-row"><label><span data-i18n="停止温度（°C）">停止温度（°C）</span><input id="temperature" type="number" value="80" min="60" max="90"></label></div>
+                  <div class="field-row"><label><span data-i18n="GPU負荷">GPU負荷</span><select id="workload"><option value="1" data-i18n="低負荷">低負荷</option><option value="2" data-i18n="標準">標準</option><option value="3" data-i18n="高負荷">高負荷</option><option value="auto" data-i18n="自動測定（低〜高負荷）">自動測定（低〜高負荷）</option></select></label><label><span data-i18n="カーネル">カーネル</span><select id="kernel"><option value="auto" data-i18n="自動最適化">自動最適化</option><option value="pure" data-i18n="標準カーネル">標準カーネル</option></select></label></div>
+                  <label for="devices"><span data-i18n="デバイスID（空欄で自動）">デバイスID（空欄で自動）</span></label><input id="devices" placeholder="1" inputmode="numeric">
                 </details>
-                <div class="search-start"><label>探索時間の上限（分）<input id="minutes" type="number" value="10" min="1" max="1440"></label><button class="primary form-submit" type="submit"><i data-lucide="play"></i>パスワードを探す</button></div>
+                <div class="search-start"><label><span data-i18n="探索時間の上限（分）">探索時間の上限（分）</span><input id="minutes" type="number" value="10" min="1" max="1440"></label><button class="primary form-submit" type="submit"><i data-lucide="play"></i><span data-i18n="パスワードを探す">パスワードを探す</span></button></div>
               </form>
             </div>
           </div>
           <div id="export-panel" role="tabpanel" aria-labelledby="tab-export" hidden>
-            <form id="export-form"><label for="export-kind">出力形式</label><select id="export-kind"><option value="pdf">PDF (.pdf)</option><option value="image_pdf">画像PDF (.pdf)</option><option value="word">Word・ページ画像 (.docx)</option><option value="images">ページ画像 (.zip)</option><option value="text">既存テキスト抽出 (.md)</option></select>
-              <div class="field-row" id="image-options"><label>解像度<select id="dpi"><option value="100">100 dpi</option><option value="150">150 dpi</option><option value="200" selected>200 dpi</option><option value="300">300 dpi</option></select></label><label>カラー<select id="color"><option value="color">カラー</option><option value="gray">グレースケール</option></select></label></div>
-              <p id="format-note" class="muted"></p><button class="primary form-submit" type="submit"><i data-lucide="download"></i>書き出す</button>
+            <form id="export-form"><label for="export-kind"><span data-i18n="出力形式">出力形式</span></label><select id="export-kind"><option value="pdf">PDF (.pdf)</option><option value="image_pdf" data-i18n="画像PDF (.pdf)">画像PDF (.pdf)</option><option value="word" data-i18n="Word・ページ画像 (.docx)">Word・ページ画像 (.docx)</option><option value="images" data-i18n="ページ画像 (.zip)">ページ画像 (.zip)</option><option value="text" data-i18n="既存テキスト抽出 (.md)">既存テキスト抽出 (.md)</option></select>
+              <div class="field-row" id="image-options"><label><span data-i18n="解像度">解像度</span><select id="dpi"><option value="100">100 dpi</option><option value="150">150 dpi</option><option value="200" selected>200 dpi</option><option value="300">300 dpi</option></select></label><label><span data-i18n="カラー">カラー</span><select id="color"><option value="color" data-i18n="カラー">カラー</option><option value="gray" data-i18n="グレースケール">グレースケール</option></select></label></div>
+              <p id="format-note" class="muted"></p><button class="primary form-submit" type="submit"><i data-lucide="download"></i><span data-i18n="書き出す">書き出す</span></button>
             </form>
-            <h3 class="output-heading">保存済みファイル</h3><div id="outputs"></div>
+            <h3 class="output-heading"><span data-i18n="保存済みファイル">保存済みファイル</span></h3><div id="outputs"></div>
           </div>
-          <section id="preview" class="preview" aria-label="開封済みファイルのプレビュー" hidden>
-            <div class="preview-toolbar"><span>プレビュー</span><div class="page-controls"><button class="icon quiet" id="refresh-preview" title="プレビューを再読み込み" aria-label="プレビューを再読み込み"><i data-lucide="refresh-cw"></i></button><button class="icon quiet" id="previous-page" title="前のページ" aria-label="前のページ"><i data-lucide="chevron-left"></i></button><span id="page-indicator">—</span><button class="icon quiet" id="next-page" title="次のページ" aria-label="次のページ"><i data-lucide="chevron-right"></i></button></div></div>
-            <div class="preview-body"><div id="contents-preview" hidden></div><p id="preview-message" role="status" hidden></p><img id="page-image" alt="選択したPDFのページ" hidden></div>
+          <section id="preview" class="preview" aria-label="開封済みファイルのプレビュー" hidden data-i18n-aria-label="開封済みファイルのプレビュー">
+            <div class="preview-toolbar"><span><span data-i18n="プレビュー">プレビュー</span></span><div class="page-controls"><button class="icon quiet" id="refresh-preview" title="プレビューを再読み込み" aria-label="プレビューを再読み込み" data-i18n-title="プレビューを再読み込み" data-i18n-aria-label="プレビューを再読み込み"><i data-lucide="refresh-cw"></i></button><button class="icon quiet" id="previous-page" title="前のページ" aria-label="前のページ" data-i18n-title="前のページ" data-i18n-aria-label="前のページ"><i data-lucide="chevron-left"></i></button><span id="page-indicator">—</span><button class="icon quiet" id="next-page" title="次のページ" aria-label="次のページ" data-i18n-title="次のページ" data-i18n-aria-label="次のページ"><i data-lucide="chevron-right"></i></button></div></div>
+            <div class="preview-body"><div id="contents-preview" hidden></div><p id="preview-message" role="status" hidden></p><img id="page-image" alt="選択したPDFのページ" hidden data-i18n-alt="選択したPDFのページ"></div>
           </section>
         </section>
-        <aside class="inspector" aria-label="実行状況">
-          <div class="inspector-heading"><h2>実行状況</h2><span id="job-status-label" class="status" aria-live="polite"></span></div>
+        <aside class="inspector" aria-label="実行状況" data-i18n-aria-label="実行状況">
+          <div class="inspector-heading"><h2><span data-i18n="実行状況">実行状況</span></h2><span id="job-status-label" class="status" aria-live="polite"></span></div>
           <section class="job-status">
-            <h3 class="subheading">現在の工程</h3>
-            <ol class="stepper" id="job-steps" aria-label="処理工程">
-              <li id="step-prepare"><span class="step-dot"><i data-lucide="check"></i></span><span class="step-name">候補準備</span></li>
-              <li id="step-search"><span class="step-dot"><i data-lucide="check"></i></span><span class="step-name">候補探索</span></li>
-              <li id="step-open"><span class="step-dot"><i data-lucide="check"></i></span><span class="step-name">開封</span></li>
+            <h3 class="subheading"><span data-i18n="現在の工程">現在の工程</span></h3>
+            <ol class="stepper" id="job-steps" aria-label="処理工程" data-i18n-aria-label="処理工程">
+              <li id="step-prepare"><span class="step-dot"><i data-lucide="check"></i></span><span class="step-name"><span data-i18n="候補準備">候補準備</span></span></li>
+              <li id="step-search"><span class="step-dot"><i data-lucide="check"></i></span><span class="step-name"><span data-i18n="候補探索">候補探索</span></span></li>
+              <li id="step-open"><span class="step-dot"><i data-lucide="check"></i></span><span class="step-name"><span data-i18n="開封">開封</span></span></li>
             </ol>
             <p id="stage-detail" class="muted"></p>
-            <div class="job-actions"><button id="resume-job" hidden><i data-lucide="play"></i>再開</button><button id="pause-job" hidden><i data-lucide="pause"></i>一時停止</button><button class="danger quiet" id="cancel-job" hidden><i data-lucide="square"></i><span id="cancel-label">探索を中止</span></button></div>
-            <div class="progress-heading"><h3 id="progress-label">候補範囲の進捗</h3><button class="icon quiet info-button" type="button" title="指定した候補範囲の処理割合です。解除の成功確率ではありません。" aria-label="進捗は指定した候補範囲の処理割合で、解除の成功確率ではありません。"><i data-lucide="info"></i></button></div>
+            <div class="job-actions"><button id="resume-job" hidden><i data-lucide="play"></i><span data-i18n="再開">再開</span></button><button id="pause-job" hidden><i data-lucide="pause"></i><span data-i18n="探索を一時停止">探索を一時停止</span></button><button class="danger quiet" id="cancel-job" hidden><i data-lucide="square"></i><span id="cancel-label"><span data-i18n="探索を中止">探索を中止</span></span></button></div>
+            <div class="progress-heading"><h3 id="progress-label"><span data-i18n="候補範囲の進捗">候補範囲の進捗</span></h3><button class="icon quiet info-button" type="button" title="指定した候補範囲の処理割合です。解除の成功確率ではありません。" aria-label="進捗は指定した候補範囲の処理割合で、解除の成功確率ではありません。" data-i18n-title="指定した候補範囲の処理割合です。解除の成功確率ではありません。" data-i18n-aria-label="進捗は指定した候補範囲の処理割合で、解除の成功確率ではありません。"><i data-lucide="info"></i></button></div>
             <div class="progress-values"><strong id="progress-count">—</strong><span id="percentage">—</span></div>
             <div id="job-progress" class="progress-track" role="progressbar" aria-labelledby="progress-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progress-fill" class="progress-fill"><span class="progress-sheen"></span></div></div>
-            <dl class="metrics"><dt>試行速度</dt><dd id="speed">—</dd><dt>GPU温度</dt><dd id="gpu-temp">—</dd><dt>経過時間</dt><dd id="elapsed">—</dd></dl>
+            <dl class="metrics"><dt><span data-i18n="試行速度">試行速度</span></dt><dd id="speed">—</dd><dt><span data-i18n="GPU温度">GPU温度</span></dt><dd id="gpu-temp">—</dd><dt><span data-i18n="経過時間">経過時間</span></dt><dd id="elapsed">—</dd></dl>
             <p id="job-message" role="status"></p><div id="warnings"></div>
           </section>
-          <section class="event-section"><h3>実行ログ</h3><ol id="event-log" aria-label="実行ログ"></ol></section>
-          <section class="quick-export"><h3>書き出し</h3><a id="quick-download" class="secondary" aria-disabled="true" tabindex="-1"><i data-lucide="download"></i>パスワードなしで保存</a><button id="export-options" class="quiet" disabled><i data-lucide="sliders-horizontal"></i>書き出し形式を選択</button></section>
+          <section class="event-section"><h3><span data-i18n="実行ログ">実行ログ</span></h3><ol id="event-log" aria-label="実行ログ" data-i18n-aria-label="実行ログ"></ol></section>
+          <section class="quick-export"><h3><span data-i18n="書き出し">書き出し</span></h3><a id="quick-download" class="secondary" aria-disabled="true" tabindex="-1"><i data-lucide="download"></i><span data-i18n="パスワードなしで保存">パスワードなしで保存</span></a><button id="export-options" class="quiet" disabled><i data-lucide="sliders-horizontal"></i><span data-i18n="書き出し形式を選択">書き出し形式を選択</span></button></section>
         </aside>
       </div>
     </div>
   </main>
 </div>
 <dialog id="settings-dialog" aria-labelledby="settings-title"><form id="settings-form">
-  <div class="dialog-heading"><h2 id="settings-title">設定</h2><button class="icon quiet" type="button" id="settings-close" aria-label="設定を閉じる" title="閉じる"><i data-lucide="x"></i></button></div>
+  <div class="dialog-heading"><h2 id="settings-title"><span data-i18n="設定">設定</span></h2><button class="icon quiet" type="button" id="settings-close" aria-label="設定を閉じる" title="閉じる" data-i18n-aria-label="設定を閉じる" data-i18n-title="閉じる"><i data-lucide="x"></i></button></div>
   <section class="settings-section">
-    <h3>利用状況</h3>
-    <dl class="capability-list"><dt>分かっているパスワードで解除</dt><dd><i data-lucide="check"></i>設定不要</dd><dt>忘れたパスワードを探す</dt><dd id="recovery-availability">未設定</dd><dt>ZIPのパスワードを探す</dt><dd id="zip-availability">未設定</dd></dl>
+    <h3><span data-i18n="利用状況">利用状況</span></h3>
+    <dl class="capability-list"><dt><span data-i18n="分かっているパスワードで解除">分かっているパスワードで解除</span></dt><dd><i data-lucide="check"></i><span data-i18n="設定不要">設定不要</span></dd><dt><span data-i18n="忘れたパスワードを探す">忘れたパスワードを探す</span></dt><dd id="recovery-availability"><span data-i18n="未設定">未設定</span></dd><dt><span data-i18n="ZIPのパスワードを探す">ZIPのパスワードを探す</span></dt><dd id="zip-availability"><span data-i18n="未設定">未設定</span></dd></dl>
   </section>
   <section class="settings-section">
-    <div class="settings-heading"><h3>探索エンジン</h3><button type="button" id="detect-tools"><i data-lucide="search"></i>自動検出</button></div>
-    <button type="button" id="setup-open" class="quiet"><i data-lucide="package-plus"></i>セットアップとGPU診断</button>
-    <div class="engine-state"><strong>Hashcat</strong><span id="hashcat-status" class="muted">未設定</span><a href="https://hashcat.net/hashcat/" target="_blank" rel="noopener noreferrer">公式ダウンロード<i data-lucide="external-link"></i></a></div>
-    <details id="engine-paths"><summary><i data-lucide="chevron-right"></i>実行ファイルの場所を指定</summary>
-      <label for="hashcat-path">Hashcat の実行ファイル</label><input id="hashcat-path" spellcheck="false" autocomplete="off" placeholder="hashcat.exe / hashcat / hashcat.bin" aria-describedby="hashcat-error"><p id="hashcat-error" class="field-error" hidden></p>
-      <label for="zip2john-path">zip2john の実行ファイル <span class="muted">ZIP探索のみ・任意</span></label><input id="zip2john-path" spellcheck="false" autocomplete="off" placeholder="zip2john.exe / zip2john" aria-describedby="zip2john-error"><p id="zip2john-error" class="field-error" hidden></p>
+    <div class="settings-heading"><h3><span data-i18n="探索エンジン">探索エンジン</span></h3><button type="button" id="detect-tools"><i data-lucide="search"></i><span data-i18n="自動検出">自動検出</span></button></div>
+    <button type="button" id="setup-open" class="quiet"><i data-lucide="package-plus"></i><span data-i18n="セットアップとGPU診断">セットアップとGPU診断</span></button>
+    <div class="engine-state"><strong>Hashcat</strong><span id="hashcat-status" class="muted"><span data-i18n="未設定">未設定</span></span><a href="https://hashcat.net/hashcat/" target="_blank" rel="noopener noreferrer"><span data-i18n="公式ダウンロード">公式ダウンロード</span><i data-lucide="external-link"></i></a></div>
+    <details id="engine-paths"><summary><i data-lucide="chevron-right"></i><span data-i18n="実行ファイルの場所を指定">実行ファイルの場所を指定</span></summary>
+      <label for="hashcat-path"><span data-i18n="Hashcat の実行ファイル">Hashcat の実行ファイル</span></label><input id="hashcat-path" spellcheck="false" autocomplete="off" placeholder="hashcat.exe / hashcat / hashcat.bin" aria-describedby="hashcat-error"><p id="hashcat-error" class="field-error" hidden></p>
+      <label for="zip2john-path"><span data-i18n="zip2john の実行ファイル ">zip2john の実行ファイル </span><span class="muted"><span data-i18n="ZIP探索のみ・任意">ZIP探索のみ・任意</span></span></label><input id="zip2john-path" spellcheck="false" autocomplete="off" placeholder="zip2john.exe / zip2john" aria-describedby="zip2john-error"><p id="zip2john-error" class="field-error" hidden></p>
     </details>
     <p id="settings-feedback" class="muted" role="status" hidden></p>
-    <div class="diagnostic-row"><button type="button" id="diagnostics" disabled><i data-lucide="cpu"></i><span id="diagnostics-label">GPUを確認</span></button><span id="gpu-status" class="muted">未確認</span></div>
-    <details id="diagnostics-details" hidden><summary><i data-lucide="chevron-right"></i>診断ログ</summary><pre id="diagnostics-result"></pre></details>
+    <div class="diagnostic-row"><button type="button" id="diagnostics" disabled><i data-lucide="cpu"></i><span id="diagnostics-label"><span data-i18n="GPUを確認">GPUを確認</span></span></button><span id="gpu-status" class="muted"><span data-i18n="未確認">未確認</span></span></div>
+    <details id="diagnostics-details" hidden><summary><i data-lucide="chevron-right"></i><span data-i18n="診断ログ">診断ログ</span></summary><pre id="diagnostics-result"></pre></details>
   </section>
-  <section class="settings-section settings-storage"><div class="settings-heading"><h3>ライブラリの保存先</h3><button type="button" id="security-open"><i data-lucide="shield-check"></i>保護状態</button></div><div id="output-path" class="path"></div><p id="startup-summary" class="muted" hidden></p></section>
-  <div class="settings-footer"><a href="/api/licenses" target="_blank" rel="noopener">ライセンス</a><span id="settings-save-state" class="muted" aria-live="polite"></span><button type="submit" class="primary" id="settings-save"><i data-lucide="save"></i>保存して閉じる</button></div>
+  <section class="settings-section settings-storage"><div class="settings-heading"><h3><span data-i18n="ライブラリの保存先">ライブラリの保存先</span></h3><button type="button" id="security-open"><i data-lucide="shield-check"></i><span data-i18n="保護状態">保護状態</span></button></div><div id="output-path" class="path"></div><p id="startup-summary" class="muted" hidden></p></section>
+  <div class="settings-footer"><a href="/api/licenses" target="_blank" rel="noopener"><span data-i18n="ライセンス">ライセンス</span></a><span id="settings-save-state" class="muted" aria-live="polite"></span><button type="submit" class="primary" id="settings-save"><i data-lucide="save"></i><span data-i18n="保存して閉じる">保存して閉じる</span></button></div>
 </form></dialog>
 <dialog id="security-dialog" aria-labelledby="security-title">
-  <div class="dialog-heading"><h2 id="security-title">データの保護状態</h2><button class="icon quiet" type="button" id="security-close" aria-label="保護状態を閉じる" title="閉じる"><i data-lucide="x"></i></button></div>
+  <div class="dialog-heading"><h2 id="security-title"><span data-i18n="データの保護状態">データの保護状態</span></h2><button class="icon quiet" type="button" id="security-close" aria-label="保護状態を閉じる" title="閉じる" data-i18n-aria-label="保護状態を閉じる" data-i18n-title="閉じる"><i data-lucide="x"></i></button></div>
   <section class="settings-section">
-    <div class="settings-heading"><h3>保存先のディスク暗号化</h3><button type="button" id="security-check"><i data-lucide="scan-line"></i>確認する</button></div>
-    <strong id="security-storage-state" role="status">未確認</strong>
+    <div class="settings-heading"><h3><span data-i18n="保存先のディスク暗号化">保存先のディスク暗号化</span></h3><button type="button" id="security-check"><i data-lucide="scan-line"></i><span data-i18n="確認する">確認する</span></button></div>
+    <strong id="security-storage-state" role="status"><span data-i18n="未確認">未確認</span></strong>
     <p id="security-storage-detail" class="muted"></p>
-    <a id="security-help" target="_blank" rel="noopener noreferrer">OSの暗号化設定・回復キーについて<i data-lucide="external-link"></i></a>
+    <a id="security-help" target="_blank" rel="noopener noreferrer"><span data-i18n="OSの暗号化設定・回復キーについて">OSの暗号化設定・回復キーについて</span><i data-lucide="external-link"></i></a>
     <p class="muted" id="security-checked-at"></p>
   </section>
-  <section class="settings-section"><h3>保護の範囲</h3>
-    <dl class="security-boundaries"><dt>アプリ独自の保存暗号化</dt><dd>未対応</dd><dt>文書処理のリソース制限</dt><dd>対応済み</dd><dt>OS権限・通信の完全な隔離</dt><dd>未対応</dd></dl>
-    <p class="muted">ディスク暗号化は盗難・紛失への対策です。ログイン中の同じユーザーの操作や不正プログラムからは保護しません。書き出し先・バックアップ先は別途確認が必要です。</p>
+  <section class="settings-section"><h3><span data-i18n="保護の範囲">保護の範囲</span></h3>
+    <dl class="security-boundaries"><dt><span data-i18n="アプリ独自の保存暗号化">アプリ独自の保存暗号化</span></dt><dd><span data-i18n="未対応">未対応</span></dd><dt><span data-i18n="文書処理のリソース制限">文書処理のリソース制限</span></dt><dd><span data-i18n="対応済み">対応済み</span></dd><dt><span data-i18n="OS権限・通信の完全な隔離">OS権限・通信の完全な隔離</span></dt><dd><span data-i18n="未対応">未対応</span></dd></dl>
+    <p class="muted"><span data-i18n="ディスク暗号化は盗難・紛失への対策です。ログイン中の同じユーザーの操作や不正プログラムからは保護しません。書き出し先・バックアップ先は別途確認が必要です。">ディスク暗号化は盗難・紛失への対策です。ログイン中の同じユーザーの操作や不正プログラムからは保護しません。書き出し先・バックアップ先は別途確認が必要です。</span></p>
   </section>
 </dialog>
 <dialog id="setup-dialog" aria-labelledby="setup-title">
-  <div class="dialog-heading"><div class="setup-brand"><img src="/icon-64.png" width="40" height="40" alt=""><h2 id="setup-title">はじめに</h2></div><button type="button" class="icon quiet" id="setup-close" title="閉じる" aria-label="ガイドを閉じる"><i data-lucide="x"></i></button></div>
-  <div class="tabs setup-tabs" role="tablist" aria-label="セットアップ">
-    <button type="button" id="setup-tab-guide" role="tab" aria-controls="setup-guide" aria-selected="true">使い方</button>
-    <button type="button" id="setup-tab-diagnostic" role="tab" aria-controls="setup-diagnostic" aria-selected="false" tabindex="-1">GPU診断</button>
-    <button type="button" id="setup-tab-components" role="tab" aria-controls="setup-components" aria-selected="false" tabindex="-1">追加部品</button>
+  <div class="dialog-heading"><div class="setup-brand"><img src="/icon-64.png" width="40" height="40" alt=""><h2 id="setup-title"><span data-i18n="はじめに">はじめに</span></h2></div><button type="button" class="icon quiet" id="setup-close" title="閉じる" aria-label="ガイドを閉じる" data-i18n-title="閉じる" data-i18n-aria-label="ガイドを閉じる"><i data-lucide="x"></i></button></div>
+  <div class="tabs setup-tabs" role="tablist" aria-label="セットアップ" data-i18n-aria-label="セットアップ">
+    <button type="button" id="setup-tab-guide" role="tab" aria-controls="setup-guide" aria-selected="true"><span data-i18n="使い方">使い方</span></button>
+    <button type="button" id="setup-tab-diagnostic" role="tab" aria-controls="setup-diagnostic" aria-selected="false" tabindex="-1"><span data-i18n="GPU診断">GPU診断</span></button>
+    <button type="button" id="setup-tab-components" role="tab" aria-controls="setup-components" aria-selected="false" tabindex="-1"><span data-i18n="追加部品">追加部品</span></button>
   </div>
   <section id="setup-guide" class="setup-panel" role="tabpanel" aria-labelledby="setup-tab-guide">
     <ol class="guide-steps">
-      <li><i data-lucide="file-plus-2"></i><div><h3>ファイルを追加</h3><p>ご自身のファイル、または許可を得たファイルを選択します。追加元の原本は変更しません。</p></div></li>
-      <li><i data-lucide="search"></i><div><h3>覚えていることから探す</h3><p>語句や数字などの手掛かりを入力します。分からない項目は空欄で進められます。パスワードが分かる場合は「パスワードが分かる」を選びます。</p></div></li>
-      <li><i data-lucide="download"></i><div><h3>結果を保存</h3><p>解除できたらパスワードをコピーし、「パスワードなしで保存」で別ファイルに保存します。アプリ終了後はパスワード表示が消えます。</p></div></li>
+      <li><i data-lucide="file-plus-2"></i><div><h3><span data-i18n="ファイルを追加">ファイルを追加</span></h3><p><span data-i18n="ご自身のファイル、または許可を得たファイルを選択します。追加元の原本は変更しません。">ご自身のファイル、または許可を得たファイルを選択します。追加元の原本は変更しません。</span></p></div></li>
+      <li><i data-lucide="search"></i><div><h3><span data-i18n="覚えていることから探す">覚えていることから探す</span></h3><p><span data-i18n="語句や数字などの手掛かりを入力します。分からない項目は空欄で進められます。パスワードが分かる場合は「パスワードが分かる」を選びます。">語句や数字などの手掛かりを入力します。分からない項目は空欄で進められます。パスワードが分かる場合は「パスワードが分かる」を選びます。</span></p></div></li>
+      <li><i data-lucide="download"></i><div><h3><span data-i18n="結果を保存">結果を保存</span></h3><p><span data-i18n="解除できたらパスワードをコピーし、「パスワードなしで保存」で別ファイルに保存します。アプリ終了後はパスワード表示が消えます。">解除できたらパスワードをコピーし、「パスワードなしで保存」で別ファイルに保存します。アプリ終了後はパスワード表示が消えます。</span></p></div></li>
     </ol>
-    <p class="setup-note">復元を保証するものではありません。手掛かりが少ない場合や長いパスワードは、時間内に見つからないことがあります。</p>
-    <button type="button" class="primary" id="guide-next"><i data-lucide="arrow-right"></i>GPU・実行環境を確認</button>
+    <p class="setup-note"><span data-i18n="復元を保証するものではありません。手掛かりが少ない場合や長いパスワードは、時間内に見つからないことがあります。">復元を保証するものではありません。手掛かりが少ない場合や長いパスワードは、時間内に見つからないことがあります。</span></p>
+    <button type="button" class="primary" id="guide-next"><i data-lucide="arrow-right"></i><span data-i18n="GPU・実行環境を確認">GPU・実行環境を確認</span></button>
   </section>
   <section id="setup-diagnostic" class="setup-panel" role="tabpanel" aria-labelledby="setup-tab-diagnostic" hidden>
-    <div class="settings-heading"><h3>このPCの実行環境</h3><button type="button" id="setup-diagnose"><i data-lucide="scan-line"></i>診断する</button></div>
-    <p class="setup-note">認識診断では計算しません。ドライバーは変更しません。</p>
-    <div id="setup-diagnostic-result" aria-live="polite"><p class="muted">未診断</p></div>
-    <details id="setup-diagnostic-details" hidden><summary><i data-lucide="chevron-right"></i>Hashcatの診断ログ</summary><pre id="setup-diagnostic-log"></pre></details>
+    <div class="settings-heading"><h3><span data-i18n="このPCの実行環境">このPCの実行環境</span></h3><button type="button" id="setup-diagnose"><i data-lucide="scan-line"></i><span data-i18n="診断する">診断する</span></button></div>
+    <p class="setup-note"><span data-i18n="認識診断では計算しません。ドライバーは変更しません。">認識診断では計算しません。ドライバーは変更しません。</span></p>
+    <div id="setup-diagnostic-result" aria-live="polite"><p class="muted"><span data-i18n="未診断">未診断</span></p></div>
+    <details id="setup-diagnostic-details" hidden><summary><i data-lucide="chevron-right"></i><span data-i18n="Hashcatの診断ログ">Hashcatの診断ログ</span></summary><pre id="setup-diagnostic-log"></pre></details>
     <section id="setup-compute" hidden>
-      <h3>GPU計算テスト</h3>
-      <p class="setup-note">テスト用PDFのみ使用・低負荷設定・最大120秒。温度取得可能時は75℃で中止。</p>
-      <label for="setup-compute-device">テストするGPU</label>
+      <h3><span data-i18n="GPU計算テスト">GPU計算テスト</span></h3>
+      <p class="setup-note"><span data-i18n="テスト用PDFのみ使用・低負荷設定・最大120秒。温度取得可能時は75℃で中止。">テスト用PDFのみ使用・低負荷設定・最大120秒。温度取得可能時は75℃で中止。</span></p>
+      <label for="setup-compute-device"><span data-i18n="テストするGPU">テストするGPU</span></label>
       <select id="setup-compute-device"></select>
-      <div class="inline-actions"><button type="button" id="setup-compute-start"><i data-lucide="play"></i>計算テストを実行</button><button type="button" id="setup-compute-cancel" hidden><i data-lucide="square"></i>テストを中止</button></div>
+      <div class="inline-actions"><button type="button" id="setup-compute-start"><i data-lucide="play"></i><span data-i18n="計算テストを実行">計算テストを実行</span></button><button type="button" id="setup-compute-cancel" hidden><i data-lucide="square"></i><span data-i18n="テストを中止">テストを中止</span></button></div>
       <p id="setup-compute-result" role="status"></p>
-      <details id="setup-compute-details" hidden><summary>計算テストの診断ログ</summary><pre id="setup-compute-log"></pre></details>
-      <p class="setup-note">判定対象：PDF 1.1–1.3の照合。速度・全形式の動作保証ではありません。テスト用データは終了後に削除します。</p>
+      <details id="setup-compute-details" hidden><summary><span data-i18n="計算テストの診断ログ">計算テストの診断ログ</span></summary><pre id="setup-compute-log"></pre></details>
+      <p class="setup-note"><span data-i18n="判定対象：PDF 1.1–1.3の照合。速度・全形式の動作保証ではありません。テスト用データは終了後に削除します。">判定対象：PDF 1.1–1.3の照合。速度・全形式の動作保証ではありません。テスト用データは終了後に削除します。</span></p>
     </section>
-    <button type="button" id="diagnostic-next"><i data-lucide="package-plus"></i>必要な追加部品を確認</button>
+    <button type="button" id="diagnostic-next"><i data-lucide="package-plus"></i><span data-i18n="必要な追加部品を確認">必要な追加部品を確認</span></button>
   </section>
   <section id="setup-components" class="setup-panel" role="tabpanel" aria-labelledby="setup-tab-components" hidden>
-    <h3>必要なものだけ導入</h3>
-    <p class="setup-note">ドライバー、CUDA開発ツール一式、John、Officeは導入しません。既存のツールとシステム設定は変更しません。</p>
+    <h3><span data-i18n="必要なものだけ導入">必要なものだけ導入</span></h3>
+    <p class="setup-note"><span data-i18n="ドライバー、CUDA開発ツール一式、John、Officeは導入しません。既存のツールとシステム設定は変更しません。">ドライバー、CUDA開発ツール一式、John、Officeは導入しません。既存のツールとシステム設定は変更しません。</span></p>
     <div id="setup-component-list"></div>
-    <h3 class="setup-location-heading">保存先</h3><div id="setup-destination" class="path"></div>
-    <div id="setup-progress" hidden><progress id="setup-download-progress" max="100" value="0" aria-label="部品のダウンロード"></progress><span id="setup-progress-text" role="status"></span><button type="button" id="setup-cancel"><i data-lucide="square"></i>導入を中止</button></div>
+    <h3 class="setup-location-heading"><span data-i18n="保存先">保存先</span></h3><div id="setup-destination" class="path"></div>
+    <div id="setup-progress" hidden><progress id="setup-download-progress" max="100" value="0" aria-label="部品のダウンロード" data-i18n-aria-label="部品のダウンロード"></progress><span id="setup-progress-text" role="status"></span><button type="button" id="setup-cancel"><i data-lucide="square"></i><span data-i18n="導入を中止">導入を中止</span></button></div>
     <p id="setup-operation-message" role="status"></p>
-    <button type="button" id="setup-check-again" hidden><i data-lucide="scan-line"></i>GPU診断へ</button>
+    <button type="button" id="setup-check-again" hidden><i data-lucide="scan-line"></i><span data-i18n="GPU診断へ">GPU診断へ</span></button>
   </section>
   <p id="setup-error" class="field-error" role="alert" hidden></p>
-  <div class="setup-footer"><span class="muted">文書・パスワードは外部に送信しません</span><button type="button" id="setup-finish">閉じて作業する</button></div>
+  <div class="setup-footer"><span class="muted"><span data-i18n="文書・パスワードは外部に送信しません">文書・パスワードは外部に送信しません</span></span><button type="button" id="setup-finish"><span data-i18n="閉じて作業する">閉じて作業する</span></button></div>
 </dialog>
-<dialog id="remove-dialog"><h2>ライブラリから削除</h2><p id="remove-name"></p><p class="muted">作業用コピーと書き出したファイルを削除します。追加元の原本は残ります。</p><div class="inline-actions"><button id="remove-cancel">キャンセル</button><button class="danger-solid" id="remove-confirm"><i data-lucide="trash-2"></i>削除</button></div></dialog>
-<div id="toast" role="alert" hidden></div><div id="drop-overlay" hidden>ファイルを追加</div>
+<dialog id="remove-dialog"><h2><span data-i18n="ライブラリから削除">ライブラリから削除</span></h2><p id="remove-name"></p><p class="muted"><span data-i18n="作業用コピーと書き出したファイルを削除します。追加元の原本は残ります。">作業用コピーと書き出したファイルを削除します。追加元の原本は残ります。</span></p><div class="inline-actions"><button id="remove-cancel"><span data-i18n="キャンセル">キャンセル</span></button><button class="danger-solid" id="remove-confirm"><i data-lucide="trash-2"></i><span data-i18n="削除">削除</span></button></div></dialog>
+<div id="toast" role="alert" hidden></div><div id="drop-overlay" hidden><span data-i18n="ファイルを追加">ファイルを追加</span></div>
 </body>
 </html>
