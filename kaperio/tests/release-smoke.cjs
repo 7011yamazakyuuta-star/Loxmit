@@ -103,6 +103,28 @@ async function settingsChecks(page, context, base, data) {
   assert.equal(await page.locator('#diagnostics').isEnabled(),false);
   assert.match(await page.locator('#recovery-availability').textContent(),/Hashcat未設定/);
   await page.screenshot({path:path.join(data,'settings-unconfigured.png'),fullPage:true});
+  await page.locator('#security-open').click();
+  await page.locator('#security-dialog').waitFor({state:'visible'});
+  assert.equal(await page.locator('#security-storage-state').textContent(),'未確認');
+  let storageChecks=0;
+  await page.route('**/api/security/check',route=>{
+    storageChecks++;
+    return route.fulfill({json:{storage:{state:['protected','unprotected','unknown','not_detected'][storageChecks-1]},method:'BitLocker',help_url:'https://learn.microsoft.com/windows/',checked_at:1790000000}});
+  });
+  assert.equal(storageChecks,0);
+  for(const expected of ['保護を確認','保護が無効','確認できません','暗号化経路を検出できません']){
+    await page.locator('#security-check').click();
+    await page.locator('#security-storage-state').filter({hasText:expected}).waitFor();
+  }
+  assert.match(await page.locator('#security-storage-detail').textContent(),/別方式/);
+  for(const width of [320,390,768,1440]){
+    await page.setViewportSize({width,height:900});
+    assert.ok(await page.locator('#security-dialog').evaluate(n=>n.scrollWidth<=n.clientWidth),'security overflow '+width);
+    await page.screenshot({path:path.join(data,'security-'+width+'.png'),fullPage:true});
+  }
+  await page.locator('#security-close').click();await page.unroute('**/api/security/check');
+  await page.setViewportSize({width:1440,height:1000});
+  console.log(JSON.stringify({securityPassed:true,checks:['explicit-read-only-probe','four-storage-states','responsive-security','honest-sandbox-boundary']}));
   await page.locator('#detect-tools').click();
   await page.waitForFunction(()=>!document.getElementById('detect-tools').disabled);
   assert.ok(await page.locator('#settings-feedback').isVisible());

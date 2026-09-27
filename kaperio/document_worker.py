@@ -120,6 +120,25 @@ def worker_command():
     return [sys.executable, str(Path(__file__).resolve())]
 
 
+def worker_environment(work):
+    # Inheritance reduction, not an OS sandbox: the same user can still read files.
+    allowed = {'SYSTEMROOT', 'WINDIR', 'COMSPEC', 'PATHEXT', 'LANG', 'LC_ALL', 'LC_CTYPE',
+               '_PYI_ARCHIVE_FILE', '_PYI_APPLICATION_HOME_DIR', '_PYI_PARENT_PROCESS_LEVEL',
+               '_PYI_SPLASH_IPC'}
+    env = {key: value for key, value in os.environ.items() if key.upper() in allowed}
+    if os.name == 'nt':
+        system = Path(os.environ['SystemRoot'])
+        env['PATH'] = os.pathsep.join(map(str, (system / 'System32', system)))
+    else:
+        env['PATH'] = '/usr/bin:/bin:/usr/sbin:/sbin'
+    # PyInstaller needs its own library directory, not arbitrary preload/search hooks.
+    if getattr(sys, 'frozen', False) and sys.platform.startswith('linux'):
+        env['LD_LIBRARY_PATH'] = str(Path(sys._MEIPASS))
+    env.update({name: str(work) for name in ('TMP', 'TEMP', 'TMPDIR', 'HOME', 'USERPROFILE')})
+    env['PYTHONNOUSERSITE'] = '1'
+    return env
+
+
 def end_process(process, children):
     try:
         current = psutil.Process(process.pid).children(recursive=True)
@@ -181,12 +200,11 @@ class DocumentWorker:
                 if len(request) > REQUEST_LIMIT:
                     raise ValueError('文書処理の入力が上限を超えています。')
                 flags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
-                env = os.environ.copy()
-                env.update({name: str(work) for name in ('TMP', 'TEMP', 'TMPDIR')})
+                env = worker_environment(work)
                 process = subprocess.Popen(worker_command(), stdin=subprocess.PIPE,
                                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                                            creationflags=flags, start_new_session=os.name != 'nt',
-                                           cwd=work, env=env)
+                                           cwd=work, env=env, close_fds=True)
                 children, last_progress = [], None
                 def send_request():
                     try:

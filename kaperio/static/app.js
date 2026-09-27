@@ -383,6 +383,26 @@ $('settings-open').onclick=async()=>{try{
   $('gpu-status').textContent='未確認';$('settings-dialog').showModal();
 }catch(e){toast(e.message)}};
 $('settings-close').onclick=()=>$('settings-dialog').close();
+function showSecurity(result){
+  const descriptions={
+    unchecked:['未確認','OS設定の照会のみ行います。暗号化の開始や回復キーの取得は行いません。'],
+    protected:['保護を確認',result.method+'による保存先の保護を確認しました。'],
+    unprotected:['保護が無効',result.method+'が無効、または保護が中断されています。回復キーを確保してからOSの設定を確認してください。'],
+    not_detected:['暗号化経路を検出できません', 'dm-cryptは検出されませんでした。別方式の暗号化は未確認です。'],
+    unknown:['確認できません','権限不足・確認コマンド未対応・外付けドライブなどが考えられます。未暗号化と断定した結果ではありません。OSの設定で確認してください。']
+  };
+  const [title,detail]=descriptions[result.storage.state]||descriptions.unknown;
+  $('security-storage-state').textContent=title;$('security-storage-detail').textContent=detail;
+  $('security-help').href=result.help_url;
+  $('security-checked-at').textContent=result.checked_at?'確認日時 '+new Date(result.checked_at*1000).toLocaleString():'';
+}
+$('security-open').onclick=async()=>{try{showSecurity(await api('/api/security'));$('security-dialog').showModal()}catch(error){toast(error.message)}};
+$('security-close').onclick=()=>$('security-dialog').close();
+$('security-check').onclick=async()=>{
+  $('security-check').disabled=true;$('security-storage-state').textContent='確認中…';
+  try{showSecurity(await api('/api/security/check',{}))}catch(error){$('security-storage-state').textContent='確認できません';$('security-storage-detail').textContent=error.message}
+  finally{$('security-check').disabled=false}
+};
 $('settings-dialog').addEventListener('cancel',event=>{if(settingsBusy)event.preventDefault()});
 $('settings-form').oninput=()=>{clearSettingsErrors();settingsGpuChecked=false;$('gpu-status').textContent='未確認';$('diagnostics-details').hidden=true;updateSettingsState()};
 $('settings-form').onsubmit=async e=>{e.preventDefault();settingsBusy=true;updateSettingsState();try{await saveSettings();$('settings-dialog').close();toast('設定を保存しました');await refresh()}catch(error){settingsError(error)}finally{settingsBusy=false;updateSettingsState();const invalid=$('settings-form').querySelector('[aria-invalid=true]');if(invalid)invalid.focus()}};

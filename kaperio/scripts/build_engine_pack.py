@@ -9,6 +9,7 @@ import subprocess
 import sys
 import zipfile
 from pathlib import Path
+from signing import add_arguments, sign_engine_files, validate_options
 
 ROOT = Path(__file__).resolve().parents[1]
 UPSTREAM = 'c75f446c44cd3f0742035a1394416c39bee5ea8f'
@@ -18,7 +19,9 @@ VERSION = '7.1.2'
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--source', required=True, type=Path)
+    add_arguments(parser, engine=True)
     args = parser.parse_args()
+    validate_options(args, sys.platform)
     source = args.source.resolve()
     system, machine = platform.system(), platform.machine().lower()
     if (system, machine) not in {('Darwin', 'arm64'), ('Darwin', 'x86_64'), ('Linux', 'x86_64')}:
@@ -44,6 +47,11 @@ def main():
         files.extend(p for p in (source / name).rglob('*') if p.is_file())
     if not (source / 'docs/license.txt').is_file() or not (source / 'modules/module_10400.so').is_file():
         raise SystemExit('Missing engine modules or upstream notices')
+    signed_count = sign_engine_files(files, args.macos_identity, args.macos_team_id) if args.macos_identity else 0
+    if signed_count:
+        for mode in ('10400', '10500', '10600', '10700', '9500', '9600', '13600', '17200'):
+            subprocess.run([str(source / 'hashcat'), '--hash-info', '-m', mode], cwd=source,
+                           check=True, stdout=subprocess.DEVNULL)
     with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=6) as pack:
         for path in sorted(files):
             if path.is_symlink():
@@ -62,7 +70,9 @@ def main():
                 'source_commit': UPSTREAM, 'size': archive.stat().st_size,
                 'sha256': digest,
                 'minimum_os': '15.0' if system == 'Darwin' else 'glibc 2.35',
-                'module_queries_passed': 8, 'gpu_compute_tested': False}
+                'module_queries_passed': 8, 'gpu_compute_tested': False,
+                'signing_team': args.macos_team_id if signed_count else None,
+                'signed_binaries': signed_count}
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(manifest))
 

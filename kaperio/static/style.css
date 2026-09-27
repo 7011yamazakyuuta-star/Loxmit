@@ -234,6 +234,14 @@ dialog::backdrop { background: #151b2460; }
 dialog input { margin-bottom: 22px; }
 dialog a { color: var(--accent); font-size: 12px; }
 #settings-dialog { width: min(660px, calc(100% - 24px)); padding: 0; }
+#security-dialog { width: min(580px, calc(100% - 24px)); padding: 24px; }
+#security-dialog p { line-height: 1.7; font-size: 13px; overflow-wrap: anywhere; }
+#security-dialog a { font-size: 13px; }
+#security-dialog .settings-heading { flex-wrap: wrap; }
+#security-dialog .settings-heading button { flex-shrink: 0; white-space: nowrap; margin-left: auto; }
+#security-dialog a svg { width: 14px; height: 14px; margin-left: 4px; vertical-align: middle; }
+.security-boundaries { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; font-size: 13px; margin: 20px 0; }
+.security-boundaries dd { margin: 0; color: var(--muted); }
 #settings-form { padding: 24px 28px 20px; }
 #settings-form .dialog-heading { margin-bottom: 10px; }
 .settings-section { border-top: 1px solid var(--line); padding: 20px 0; }

@@ -56,6 +56,20 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(self.request('POST','/api/import',b'not a pdf',headers)[0],400)
         self.assertEqual(self.library.snapshot(),[])
 
+    def test_security_checks_require_auth_origin_and_do_not_run_on_read(self):
+        headers = {'Cookie': 'loxmit_session=test-capability', 'X-Loxmit': '1'}
+        with patch.object(self.library.security, 'check', return_value={'storage': {'state': 'unknown'}}) as check:
+            self.assertEqual(self.request('GET', '/api/security')[0], 403)
+            self.assertEqual(self.request('POST', '/api/security/check', '{}')[0], 403)
+            status, raw = self.request('GET', '/api/security', headers=headers)
+            self.assertEqual(status, 200)
+            self.assertEqual(json.loads(raw)['storage']['state'], 'unchecked')
+            check.assert_not_called()
+            self.assertEqual(self.request('POST', '/api/security/check', '{}', dict(headers, Origin='https://other.example'))[0], 403)
+            check.assert_not_called()
+            self.assertEqual(self.request('POST', '/api/security/check', '{}', headers)[0], 200)
+            self.assertEqual(check.call_count, 1)
+
     def test_import_limit_accepts_old_limit_plus_one_and_exactly_200mb(self):
         self.assertEqual(MAX_UPLOAD, 200 * 1024 * 1024)
         headers = {'Cookie': 'loxmit_session=test-capability', 'X-Loxmit': '1', 'X-Filename': 'limit.pdf'}

@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-VERSION = '0.4.0-alpha.10'
+VERSION = '0.4.0-alpha.11'
 APP_NAME = 'Loxmit'
 APP_DIR = Path(__file__).resolve().parent
 

@@ -97,6 +97,13 @@ def main():
 
             assert request('/api/jobs', authenticated=False)[0] == 403
             assert b'Loxmit' in request('/')[1]
+            assert request('/api/security', authenticated=False)[0] == 403
+            assert api('/api/security')['storage']['state'] == 'unchecked'
+            storage = api('/api/security/check', {})
+            assert storage['storage']['state'] in {'protected', 'unprotected', 'unknown', 'not_detected'}
+            assert storage['full_sandbox'] is False and storage['application_encryption'] is False
+            assert api('/api/security')['checked_at'] == storage['checked_at']
+            checks.append('storage-check-explicit-authenticated-read-only')
             setup = api('/api/setup')
             assert not setup['guide_seen'] and setup['operation']['phase'] == 'idle'
             assert {c['id'] for c in setup['components']} == {'hashcat', 'nvrtc'}

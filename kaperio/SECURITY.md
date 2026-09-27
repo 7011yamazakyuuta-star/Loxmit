@@ -15,7 +15,11 @@ File ownership and permission are separate from the software license.
   file is removed after reading, invalid-result errors and ordinary process failures.
   Reads are bounded to 64 KiB and validation errors do not echo result contents.
   An abrupt process/machine failure may still leave it.
-- Data is NOT encrypted at rest. Protect the operating-system account and disk.
+- The app does NOT encrypt stored data itself. OS disk encryption can protect
+  the containing volume at rest; the app never enables it or retrieves recovery
+  keys. Settings > protection status can explicitly query the storage volume.
+  Unknown/unsupported results do not mean unencrypted or protected. See
+  [storage protection scope](docs/SECURITY_READINESS.md).
 - Library deletion removes work copies/exports, not the original imported file.
   It is not secure erasure and does not remove browser downloads, backups or caches.
 - Do not publish this data directory, launch URLs, screenshots with private
@@ -40,6 +44,11 @@ File ownership and permission are separate from the software license.
   time-bounded; it is not covered by the parser's memory budget.
   Avoid untrusted files; keep Python dependencies, Office and GPU drivers updated.
   Disabling macros does not eliminate parser vulnerabilities or active-content risk.
+- Document workers inherit only a small runtime/system environment allowlist.
+  API tokens, proxy settings, user Python paths and loader injection hooks are
+  not inherited. HOME and temporary paths point to the private task workspace.
+  Nonstandard runtime search paths may need a supported native bundle instead.
+  This is defense in depth, NOT a filesystem or network access restriction.
 
 ## Resource protection
 
@@ -79,3 +88,5 @@ Use a synthetic reproduction. Submit sensitive security reports through
 [GitHub private vulnerability reporting](https://github.com/7011yamazakyuuta-star/Loxmit/security/advisories/new).
 Private vulnerability reporting is enabled for this repository.
 No independent security audit, malware certification or code-signing is claimed.
+Optional signing build paths are documented in [SIGNING.md](docs/SIGNING.md).
+Mocked signing tests are not evidence of a real certificate or Apple acceptance.

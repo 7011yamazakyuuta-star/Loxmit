@@ -17,6 +17,7 @@ if mode == 'private_temp':
         Path('relative-output').write_text('private fixture')
         # macOS /var and /private/var can name the same directory.
         private = nested.resolve().is_relative_to(root.resolve()) and Path.cwd().samefile(root)
+        private = private and 'LOXMIT_TEST_PRIVATE_TOKEN' not in os.environ
         (root / 'result.json').write_text(json.dumps({'ok': True, 'result': {'private': private}}))
     sys.exit(0)
 if mode == 'os_limit':

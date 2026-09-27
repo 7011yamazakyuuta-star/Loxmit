@@ -1,4 +1,11 @@
-# Loxmit Desktop 0.4.0-alpha.10
+# Loxmit Desktop 0.4.0-alpha.11
+
+Storage protection checks and signing preparation are described in
+[SECURITY_READINESS.md](SECURITY_READINESS.md) and [SIGNING.md](SIGNING.md).
+Certificates have not been provisioned: ordinary CI builds remain unsigned
+(macOS uses ad-hoc signatures) and unnotarized. Each new native archive has a
+`.security.json` sidecar stating the requested build's verified signing scope;
+this sidecar is informational, not an independent cryptographic attestation.
 
 Document operations now use disposable, resource-limited workers. See
 [hardening boundaries](HARDENING.md); earlier native validation is not a result

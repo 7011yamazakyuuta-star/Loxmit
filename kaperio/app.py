@@ -30,6 +30,7 @@ from recovery import CREATE_FLAGS, WORD_STRATEGIES, clear_execution, has_checkpo
 from formats import SUPPORTED, office_renderer, render_office, discover_zip2john
 from runtime import APP_DIR, APP_NAME, VERSION, data_directory, engine_environment
 from environment_setup import SetupManager
+from security_status import SecurityStatus
 
 DEFAULT_DATA = data_directory()
 BUSY = {'queued', 'preparing', 'recovering', 'pausing', 'converting', 'unlocking'}
@@ -120,6 +121,7 @@ class Library:
         self.lock = threading.RLock()
         self.import_lock = threading.Lock()
         self.documents = DocumentWorker(self.root)
+        self.security = SecurityStatus(self.root)
         self.jobs = {}
         self.stops = {}
         self.passwords = {}
@@ -604,6 +606,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_data(200, dict(self.library.settings_snapshot(), connection=self.server.origin, tls=self.server.tls))
         elif path == '/api/setup':
             self.send_data(200, self.library.setup.snapshot())
+        elif path == '/api/security':
+            self.send_data(200, self.library.security.snapshot())
         elif path == '/api/licenses':
             texts = ['Loxmit third-party notices\n' + (APP_DIR / 'THIRD_PARTY.md').read_text(encoding='utf-8'),
                      'Loxmit license\n' + (APP_DIR / 'LICENSE').read_text(encoding='utf-8')]
@@ -711,6 +715,11 @@ class Handler(BaseHTTPRequestHandler):
             plan = validate_plan(data, mode)
             summary = public_plan(plan)
             self.send_data(200, {key: summary.get(key, [] if key != 'candidates' else '0') for key in ('candidates', 'groups', 'notes')})
+            return
+        elif self.path == '/api/security/check':
+            if not ipaddress.ip_address(self.client_address[0]).is_loopback:
+                raise ValueError('保存先の確認はこのPCから実行してください。')
+            self.send_data(200, self.library.security.check())
             return
         elif self.path == '/api/settings/detect':
             self.send_data(200, {'hashcat': str(self.library.discover_hashcat(configured=False) or ''),

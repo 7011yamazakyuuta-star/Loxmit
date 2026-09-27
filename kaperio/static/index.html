@@ -155,9 +155,23 @@
     <div class="diagnostic-row"><button type="button" id="diagnostics" disabled><i data-lucide="cpu"></i><span id="diagnostics-label">GPUを確認</span></button><span id="gpu-status" class="muted">未確認</span></div>
     <details id="diagnostics-details" hidden><summary><i data-lucide="chevron-right"></i>診断ログ</summary><pre id="diagnostics-result"></pre></details>
   </section>
-  <section class="settings-section settings-storage"><h3>ライブラリの保存先</h3><div id="output-path" class="path"></div></section>
+  <section class="settings-section settings-storage"><div class="settings-heading"><h3>ライブラリの保存先</h3><button type="button" id="security-open"><i data-lucide="shield-check"></i>保護状態</button></div><div id="output-path" class="path"></div></section>
   <div class="settings-footer"><a href="/api/licenses" target="_blank" rel="noopener">ライセンス</a><span id="settings-save-state" class="muted" aria-live="polite"></span><button type="submit" class="primary" id="settings-save"><i data-lucide="save"></i>保存して閉じる</button></div>
 </form></dialog>
+<dialog id="security-dialog" aria-labelledby="security-title">
+  <div class="dialog-heading"><h2 id="security-title">データの保護状態</h2><button class="icon quiet" type="button" id="security-close" aria-label="保護状態を閉じる" title="閉じる"><i data-lucide="x"></i></button></div>
+  <section class="settings-section">
+    <div class="settings-heading"><h3>保存先のディスク暗号化</h3><button type="button" id="security-check"><i data-lucide="scan-line"></i>確認する</button></div>
+    <strong id="security-storage-state" role="status">未確認</strong>
+    <p id="security-storage-detail" class="muted"></p>
+    <a id="security-help" target="_blank" rel="noopener noreferrer">OSの暗号化設定・回復キーについて<i data-lucide="external-link"></i></a>
+    <p class="muted" id="security-checked-at"></p>
+  </section>
+  <section class="settings-section"><h3>保護の範囲</h3>
+    <dl class="security-boundaries"><dt>アプリ独自の保存暗号化</dt><dd>未対応</dd><dt>文書処理のリソース制限</dt><dd>対応済み</dd><dt>OS権限・通信の完全な隔離</dt><dd>未対応</dd></dl>
+    <p class="muted">ディスク暗号化は盗難・紛失への対策です。ログイン中の同じユーザーの操作や不正プログラムからは保護しません。書き出し先・バックアップ先は別途確認が必要です。</p>
+  </section>
+</dialog>
 <dialog id="setup-dialog" aria-labelledby="setup-title">
   <div class="dialog-heading"><div class="setup-brand"><img src="/icon-64.png" width="40" height="40" alt=""><h2 id="setup-title">はじめに</h2></div><button type="button" class="icon quiet" id="setup-close" title="閉じる" aria-label="ガイドを閉じる"><i data-lucide="x"></i></button></div>
   <div class="tabs setup-tabs" role="tablist" aria-label="セットアップ">

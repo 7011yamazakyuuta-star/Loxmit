@@ -1,4 +1,5 @@
 import io
+import os
 import subprocess
 import tempfile
 import threading
@@ -68,7 +69,7 @@ class PrivacyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             worker = DocumentWorker(directory)
             try:
-                with patch('document_worker.worker_command', return_value=[sys.executable, str(fixture), 'private_temp']):
+                with patch('document_worker.worker_command', return_value=[sys.executable, str(fixture), 'private_temp']), patch.dict(os.environ, {'LOXMIT_TEST_PRIVATE_TOKEN': 'synthetic-secret'}):
                     result = worker.run('inspect', {'source': 'unused'})
                 self.assertTrue(result['private'])
                 self.assertFalse(list(Path(directory).iterdir()))
